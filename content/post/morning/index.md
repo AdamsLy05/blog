@@ -3,7 +3,7 @@ title: 晨记
 slug: morning
 date: 2026-10-28
 description: 早起这件事，我试了三次，前两次都失败了。
-image: "/img/covers/morning.svg"
+image: "cover.svg"
 categories:
   - 随笔
 tags:

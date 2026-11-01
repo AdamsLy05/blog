@@ -1,5 +1,5 @@
 ---
-image: "/img/covers/kai-zhang.svg"
+image: "cover.svg"
 title: 开张
 slug: kai-zhang
 date: 2026-11-01

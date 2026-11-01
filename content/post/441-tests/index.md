@@ -1,5 +1,5 @@
 ---
-image: "/img/covers/441.svg"
+image: "cover.svg"
 title: 我给自己的日记 App 写了 441 个测试
 slug: 441-tests
 date: 2026-11-01
