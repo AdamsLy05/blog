@@ -1,0 +1,91 @@
+baseURL = "https://adamsly05.github.io/blog/"
+languageCode = "zh-cn"
+defaultContentLanguage = "zh-cn"
+title = "理砚集"
+theme = "stack"
+hasCJKLanguage = true
+enableRobotsTXT = true
+enableEmoji = true
+
+[pagination]
+  pagerSize = 6
+
+[permalinks]
+  post = "/p/:slug/"
+  page = "/:slug/"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    noClasses = false
+    style = "dracula"
+  [markup.tableOfContents]
+    endLevel = 3
+    ordered = false
+    startLevel = 2
+
+[params]
+  mainSections = ["post"]
+  rssFullContent = true
+  favicon = "img/avatar.svg"
+  dateFormat = { published = "2006 年 01 月 02 日", lastUpdated = "2006 年 01 月 02 日" }
+
+  [params.footer]
+    since = 2026
+    customText = ""
+
+  [params.sidebar]
+    emoji = "✍️"
+    subtitle = "记录一点东西，慢慢写"
+    avatar = "img/avatar.svg"
+
+  [params.article]
+    [params.article.license]
+      enabled = false
+    [params.article.headingAnchor]
+      icon = "#"
+    [params.article.math]
+      enable = false
+
+  [params.widgets]
+    homepage = [
+      { type = "search" },
+      { type = "archives", params = { limit = 5 } },
+      { type = "categories", params = { limit = 10 } },
+    ]
+    page = [{ type = "toc" }]
+
+  [params.comments]
+    enabled = false
+
+  [params.colorScheme]
+    toggle = true
+    default = "auto"
+
+[[params.social]]
+  identifier = "github"
+  name = "GitHub"
+  url = "https://github.com/AdamsLy05"
+  [params.social.params]
+    icon = "brand-github"
+
+[[menu.main]]
+  identifier = "home"
+  name = "首页"
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  identifier = "archives"
+  name = "归档"
+  url = "/archives/"
+  weight = 2
+
+[[menu.main]]
+  identifier = "about"
+  name = "关于"
+  url = "/about/"
+  weight = 3
