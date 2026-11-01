@@ -30,7 +30,7 @@ enableEmoji = true
 [params]
   mainSections = ["post"]
   rssFullContent = true
-  favicon = "img/avatar.svg"
+  favicon = "img/avatar.jpg"
   dateFormat = { published = "2006 年 01 月 02 日", lastUpdated = "2006 年 01 月 02 日" }
 
   [params.footer]
@@ -40,7 +40,7 @@ enableEmoji = true
   [params.sidebar]
     emoji = "✍️"
     subtitle = "记录一点东西，慢慢写"
-    avatar = "img/avatar.svg"
+    avatar = "img/avatar.jpg"
 
   [params.article]
     [params.article.license]
