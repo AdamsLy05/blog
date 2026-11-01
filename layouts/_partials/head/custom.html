@@ -122,8 +122,17 @@
     [data-scheme="dark"] #main-menu > li > a { background: rgba(255, 255, 255, .09); }
     [data-scheme="dark"] #main-menu > li.current > a { color: #111; background: #eee; }
 
-    .main { padding-top: 10px; }
+    /* 收紧上下空白 */
+    .sidebar.left-sidebar { padding-top: 6px !important; padding-bottom: 4px !important; }
+    .sidebar header { margin-bottom: 0 !important; }
+    #main-menu { margin: 10px 0 2px !important; }
+    .main { padding-top: 4px !important; }
     .widget { margin-bottom: 14px; }
+
+    /* 胶囊再明显一点 */
+    #main-menu > li > a { background: rgba(0, 0, 0, .075) !important; }
+    #main-menu > li.current > a { background: #3d2f26 !important; color: #fff !important; }
+    [data-scheme="dark"] #main-menu > li > a { background: rgba(255, 255, 255, .12) !important; }
   }
 
   /* ---------- 尊重系统减少动效 ---------- */
