@@ -77,15 +77,19 @@
   @media (max-width: 768px) {
     /* 头部收紧：头像和标题并排 */
     .sidebar header {
-      display: flex;
-      align-items: center;
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      text-align: left !important;
       gap: 12px;
       padding: 2px 0 0;
       margin: 0;
     }
+    .site-meta { text-align: left !important; align-items: flex-start !important; }
     .site-avatar { margin: 0 !important; }
     .site-avatar img, .site-logo {
-      width: 54px; height: 54px; border-radius: 50%; object-fit: cover;
+      width: 54px !important; height: 54px !important; border-radius: 50%; object-fit: cover;
     }
     .site-avatar .emoji { display: none; }
     .site-name { font-size: 1.3rem; margin: 0; line-height: 1.25; }
@@ -95,7 +99,9 @@
     #toggle-menu, .hamburger { display: none !important; }
     #main-menu {
       display: flex !important;
+      flex-direction: row !important;
       flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
       margin: 14px 0 0;
       padding: 0;
