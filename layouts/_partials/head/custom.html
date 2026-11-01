@@ -1,0 +1,16 @@
+{{- $bg := "img/bg.jpg" | relURL -}}
+<style>
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("{{ $bg }}") center / cover no-repeat;
+    opacity: .07;
+    z-index: -1;
+    pointer-events: none;
+    filter: saturate(.8);
+  }
+  [data-scheme="dark"] body::before { opacity: .16; }
+  /* 让卡片在底图上有层次 */
+  .article-list article, .widget, .sidebar { backdrop-filter: blur(2px); }
+</style>
