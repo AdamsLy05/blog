@@ -2,7 +2,7 @@
 image: "cover.svg"
 title: 我没有电脑，这半年是这么写代码的
 slug: phone-as-computer
-date: 2026-11-05
+date: 2026-11-01T09:00:00+08:00
 description: 一部 Android 手机，一个 Linux 环境，加上几个 AI 工具，能撑起多少开发工作。
 categories:
   - 手机

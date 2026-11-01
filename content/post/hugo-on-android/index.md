@@ -1,7 +1,7 @@
 ---
 title: 在一部 Android 手机上跑 Hugo 和 Git
 slug: hugo-on-android
-date: 2026-11-06
+date: 2026-11-01T15:00:00+08:00
 description: 这个博客是怎么在一部手机上构建、发布、上线 GitHub Pages 的。
 categories:
   - 手机

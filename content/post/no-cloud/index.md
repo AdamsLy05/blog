@@ -2,7 +2,7 @@
 image: "cover.svg"
 title: 为什么我的 App 不做云同步
 slug: no-cloud
-date: 2026-11-04
+date: 2026-10-31
 description: 一个纯本地 App 的取舍：数据不出手机，代价我认。
 categories:
   - 技术

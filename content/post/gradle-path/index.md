@@ -2,7 +2,7 @@
 image: "cover.svg"
 title: 中文路径下，Gradle 单测为什么会全挂
 slug: gradle-path
-date: 2026-11-02
+date: 2026-10-29
 description: release 编译完全正常，单测却 403 个全红，问题不在代码，在路径。
 categories:
   - 技术

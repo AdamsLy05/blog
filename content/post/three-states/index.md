@@ -2,7 +2,7 @@
 image: "cover.svg"
 title: 查不到 ≠ 已删除
 slug: three-states
-date: 2026-11-03
+date: 2026-10-30
 description: 一个相册索引的设计错误，差点让用户以为照片全丢了。
 categories:
   - 技术
