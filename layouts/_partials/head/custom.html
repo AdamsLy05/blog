@@ -75,11 +75,49 @@
 
   /* ---------- 手机上菜单更紧凑 ---------- */
   @media (max-width: 768px) {
-    .sidebar header { padding-bottom: 8px; }
-    .sidebar .site-name { font-size: 1.5rem; }
-    .menu { justify-content: center; gap: 18px; }
-    .menu li a { font-size: .95rem; }
-    .main { padding-top: 8px; }
+    /* 头部收紧：头像和标题并排 */
+    .sidebar header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 2px 0 0;
+      margin: 0;
+    }
+    .site-avatar { margin: 0 !important; }
+    .site-avatar img, .site-logo {
+      width: 54px; height: 54px; border-radius: 50%; object-fit: cover;
+    }
+    .site-avatar .emoji { display: none; }
+    .site-name { font-size: 1.3rem; margin: 0; line-height: 1.25; }
+    .site-description { font-size: .85rem; margin: 3px 0 0; }
+
+    /* 导航不再藏进汉堡，直接铺成胶囊按钮 */
+    #toggle-menu, .hamburger { display: none !important; }
+    #main-menu {
+      display: flex !important;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    #main-menu > li { margin: 0; }
+    #main-menu > li > a {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .055);
+      font-size: .9rem;
+      line-height: 1.2;
+      transition: background .2s ease, color .2s ease;
+    }
+    #main-menu > li > a:active { transform: scale(.97); }
+    #main-menu > li.current > a { color: #fff; background: var(--card-background, #333); }
+    [data-scheme="dark"] #main-menu > li > a { background: rgba(255, 255, 255, .09); }
+    [data-scheme="dark"] #main-menu > li.current > a { color: #111; background: #eee; }
+
+    .main { padding-top: 10px; }
+    .widget { margin-bottom: 14px; }
   }
 
   /* ---------- 尊重系统减少动效 ---------- */
