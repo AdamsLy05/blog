@@ -148,7 +148,7 @@
     function init() {
       // 进场动画：卡片依次浮现
       var items = document.querySelectorAll(
-        '.article-list article, .widget, .main-article, .article-list--compact li'
+        '.article-list article, .widget, .article-list--compact li'
       );
       if (!('IntersectionObserver' in window) ||
           window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -162,7 +162,7 @@
           setTimeout(function () { el.classList.add('is-in'); }, i * 70);
           io.unobserve(el);
         });
-      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      }, { threshold: 0, rootMargin: '0px 0px -60px 0px' });
 
       items.forEach(function (el, i) {
         el.classList.add('reveal');
