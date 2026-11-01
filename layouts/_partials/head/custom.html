@@ -1,5 +1,6 @@
 {{- $bg := "img/bg.jpg" | relURL -}}
 <style>
+  /* ---------- 底图 ---------- */
   body::before {
     content: "";
     position: fixed;
@@ -11,6 +12,134 @@
     filter: saturate(.8);
   }
   [data-scheme="dark"] body::before { opacity: .16; }
-  /* 让卡片在底图上有层次 */
-  .article-list article, .widget, .sidebar { backdrop-filter: blur(2px); }
+
+  /* ---------- 页面跳转过渡（View Transitions） ---------- */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) {
+    animation: 180ms cubic-bezier(.4,0,1,1) both vt-out;
+  }
+  ::view-transition-new(root) {
+    animation: 260ms cubic-bezier(0,0,.2,1) both vt-in;
+  }
+  @keyframes vt-out { to { opacity: 0; transform: translateY(-6px); } }
+  @keyframes vt-in  { from { opacity: 0; transform: translateY(10px); } }
+
+  /* ---------- 进场动画 ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .5s cubic-bezier(0,0,.2,1), transform .5s cubic-bezier(0,0,.2,1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-in { opacity: 1; transform: none; }
+
+  /* ---------- 卡片与链接的细节 ---------- */
+  .article-list article {
+    transition: transform .25s ease, box-shadow .25s ease;
+    border-radius: 12px;
+  }
+  .article-list article:hover { transform: translateY(-3px); }
+
+  .article-subtitle a, .widget a {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size .3s ease;
+  }
+  .article-subtitle a:hover, .widget a:hover { background-size: 100% 1px; }
+
+  /* ---------- 回到顶部 ---------- */
+  #to-top {
+    position: fixed;
+    right: 16px;
+    bottom: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(30,30,30,.72);
+    color: #fff;
+    font-size: 18px;
+    line-height: 42px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+    transition: opacity .25s ease, transform .25s ease;
+    backdrop-filter: blur(8px);
+    z-index: 99;
+  }
+  #to-top.show { opacity: 1; pointer-events: auto; transform: none; }
+
+  /* ---------- 手机上菜单更紧凑 ---------- */
+  @media (max-width: 768px) {
+    .sidebar header { padding-bottom: 8px; }
+    .sidebar .site-name { font-size: 1.5rem; }
+    .menu { justify-content: center; gap: 18px; }
+    .menu li a { font-size: .95rem; }
+    .main { padding-top: 8px; }
+  }
+
+  /* ---------- 尊重系统减少动效 ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    @view-transition { navigation: none; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .article-list article { transition: none; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  }
 </style>
+<script>
+  (function () {
+    function init() {
+      // 进场动画：卡片依次浮现
+      var items = document.querySelectorAll(
+        '.article-list article, .widget, .main-article, .article-list--compact li'
+      );
+      if (!('IntersectionObserver' in window) ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var el = e.target;
+          var i = parseInt(el.dataset.revealIndex || '0', 10);
+          setTimeout(function () { el.classList.add('is-in'); }, i * 70);
+          io.unobserve(el);
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+      items.forEach(function (el, i) {
+        el.classList.add('reveal');
+        el.dataset.revealIndex = i % 6;
+        io.observe(el);
+      });
+
+      // 回到顶部
+      var btn = document.createElement('button');
+      btn.id = 'to-top';
+      btn.type = 'button';
+      btn.setAttribute('aria-label', '回到顶部');
+      btn.textContent = '↑';
+      document.body.appendChild(btn);
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      var onScroll = function () {
+        btn.classList.toggle('show', window.scrollY > 480);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    // 跨页过渡替换 DOM 后重新初始化
+    document.addEventListener('astro:page-load', init);
+  })();
+</script>
