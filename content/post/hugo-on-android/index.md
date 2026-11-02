@@ -10,6 +10,8 @@ tags:
   - Hugo
   - GitHub
   - 博客
+series:
+  - 从手机到服务器
 ---
 
 这个博客没有用任何"博客平台"。它是一堆静态文件，在一部手机上生成，推到一个 GitHub 仓库，由 GitHub Pages 提供服务。

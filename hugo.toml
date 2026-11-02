@@ -7,6 +7,11 @@ hasCJKLanguage = true
 enableRobotsTXT = true
 enableEmoji = true
 
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  series = "series"
+
 [pagination]
   pagerSize = 6
 
@@ -89,3 +94,15 @@ enableEmoji = true
   name = "关于"
   url = "/about/"
   weight = 3
+
+[[menu.main]]
+  identifier = "series"
+  name = "系列"
+  url = "/series/"
+  weight = 4
+
+[[menu.main]]
+  identifier = "rss"
+  name = "RSS"
+  url = "/index.xml"
+  weight = 5

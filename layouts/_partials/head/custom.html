@@ -196,3 +196,52 @@
     document.addEventListener('astro:page-load', init);
   })();
 </script>
+
+<style>
+  /* ---------- 阅读进度条 ---------- */
+  #reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--accent-color-darker, #7aa2c8);
+    z-index: 200;
+    pointer-events: none;
+    transition: width .08s linear;
+  }
+</style>
+<script>
+  (function () {
+    function initProgress() {
+      var old = document.getElementById('reading-progress');
+      if (old) old.remove();
+      var content = document.querySelector('.article-content');
+      if (!content) return;
+
+      var bar = document.createElement('div');
+      bar.id = 'reading-progress';
+      document.body.appendChild(bar);
+
+      var update = function () {
+        var rect = content.getBoundingClientRect();
+        var total = content.offsetHeight - window.innerHeight;
+        if (total <= 0) { bar.style.width = '100%'; return; }
+        var read = -rect.top + 120;
+        var pct = Math.min(Math.max(read / total, 0), 1) * 100;
+        bar.style.width = pct.toFixed(2) + '%';
+      };
+
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initProgress);
+    } else {
+      initProgress();
+    }
+    document.addEventListener('astro:page-load', initProgress);
+  })();
+</script>
