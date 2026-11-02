@@ -11,7 +11,7 @@ tags:
   - Android
   - 开发
 series:
-  - 从手机到服务器
+  - from-phone-to-server
 ---
 
 之前这个博客是用 Hugo 在手机上做的——构建一次不到一秒，因为它是静态生成，产物就是一堆 HTML。

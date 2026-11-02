@@ -11,7 +11,7 @@ tags:
   - Android
   - 工具
 series:
-  - 从手机到服务器
+  - from-phone-to-server
 ---
 
 我没有一台属于自己的、固定的电脑。
