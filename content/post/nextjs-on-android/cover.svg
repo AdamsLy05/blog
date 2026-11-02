@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1c2430"/><stop offset="100%" stop-color="#2b2331"/></linearGradient>
+<radialGradient id="glow" cx="0.8" cy="0.15" r="0.7"><stop offset="0%" stop-color="#7aa2c8" stop-opacity="0.5"/><stop offset="100%" stop-color="#7aa2c8" stop-opacity="0"/></radialGradient></defs>
+<rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#glow)"/>
+<circle cx="1020.0" cy="157.5" r="264.59999999999997" fill="none" stroke="#7aa2c8" stroke-opacity="0.32" stroke-width="2"/>
+<circle cx="1020.0" cy="157.5" r="189.0" fill="none" stroke="#7aa2c8" stroke-opacity="0.2" stroke-width="1.5"/>
+<text x="96.0" y="365.4" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="126.0" fill="#f5efe6" letter-spacing="4">全栈</text>
+<text x="96.0" y="466.2" font-family="-apple-system, Noto Sans CJK SC, sans-serif" font-size="39.06" fill="#f5efe6" opacity="0.7" letter-spacing="2">在手机上跑 Next.js</text></svg>
