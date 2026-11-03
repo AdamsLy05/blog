@@ -44,6 +44,7 @@ enableEmoji = true
     startLevel = 2
 
 [params]
+  description = "在手机上写代码、搭服务器、做产品的记录。"
   mainSections = ["post"]
   rssFullContent = true
   favicon = "img/avatar.jpg"

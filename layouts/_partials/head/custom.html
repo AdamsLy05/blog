@@ -457,3 +457,45 @@
 <link rel="manifest" href="{{ "site.webmanifest" | relURL }}">
 <link rel="apple-touch-icon" href="{{ "img/icon-192.png" | relURL }}">
 <meta name="theme-color" content="#1c2430">
+
+<style>
+  .not-found-links { margin: 18px 0 8px; font-size: .95rem; }
+  .not-found-links ul { margin: 8px 0 0; padding-left: 1.1rem; line-height: 2; }
+</style>
+
+<style>
+  /* ---------- 无障碍 ---------- */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 999;
+    padding: 10px 16px;
+    background: #1c2430;
+    color: #fff;
+    border-radius: 0 0 8px 0;
+  }
+  .skip-link:focus { left: 0; }
+  a:focus-visible, button:focus-visible, summary:focus-visible {
+    outline: 2px solid #7aa2c8;
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+</style>
+<script>
+  (function () {
+    function addSkipLink() {
+      if (document.querySelector('.skip-link')) return;
+      var a = document.createElement('a');
+      a.className = 'skip-link';
+      a.href = '#main';
+      a.textContent = '跳到正文';
+      document.body.insertBefore(a, document.body.firstChild);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', addSkipLink);
+    } else {
+      addSkipLink();
+    }
+  })();
+</script>
