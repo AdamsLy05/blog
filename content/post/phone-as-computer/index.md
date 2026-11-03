@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 我没有电脑，这半年是这么写代码的
 slug: phone-as-computer
 date: 2026-11-01T09:00:00+08:00

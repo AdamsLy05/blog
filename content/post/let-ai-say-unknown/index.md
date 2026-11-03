@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 让 AI 说「不知道」
 slug: let-ai-say-unknown
 date: 2026-11-02T14:00:00+08:00

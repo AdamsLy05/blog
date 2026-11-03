@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 同一份数据，只能有一个真相
 slug: single-source
 date: 2026-11-02T16:00:00+08:00

@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 在手机上写一个 Next.js 全栈
 slug: nextjs-on-android
 date: 2026-11-02T19:00:00+08:00

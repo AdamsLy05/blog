@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 中文路径下，Gradle 单测为什么会全挂
 slug: gradle-path
 date: 2026-10-29

@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 查不到 ≠ 已删除
 slug: three-states
 date: 2026-10-30

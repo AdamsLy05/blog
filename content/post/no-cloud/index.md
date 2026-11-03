@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 为什么我的 App 不做云同步
 slug: no-cloud
 date: 2026-10-31

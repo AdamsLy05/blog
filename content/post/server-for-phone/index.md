@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 给手机配一台服务器
 slug: server-for-phone
 date: 2026-11-02T23:30:00+08:00

@@ -1,5 +1,6 @@
 ---
 image: "cover.svg"
+social_image: "cover.jpg"
 title: 开张
 slug: kai-zhang
 date: 2026-11-01
