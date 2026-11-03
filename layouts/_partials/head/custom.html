@@ -485,3 +485,15 @@
     }
   })();
 </script>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="理砚集">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('{{ "sw.js" | relURL }}', { scope: '{{ "/blog/" | relURL }}' })
+        .catch(function () { /* 注册失败不影响正常浏览 */ });
+    });
+  }
+</script>
