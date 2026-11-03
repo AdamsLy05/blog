@@ -1,0 +1,29 @@
+{{- $posts := where .Site.RegularPages "Section" "post" -}}
+{{- $limit := .Site.Config.Services.RSS.Limit -}}
+{{- if ge $limit 1 -}}{{- $posts = $posts | first $limit -}}{{- end -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>{{ .Site.Title }}</title>
+    <link>{{ .Permalink }}</link>
+    <description>{{ .Site.Params.sidebar.subtitle | default .Site.Title }}</description>
+    <language>zh-cn</language>
+    {{- if $posts }}
+    <lastBuildDate>{{ (index ($posts.ByLastmod.Reverse) 0).Lastmod.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</lastBuildDate>
+    {{- end }}
+    {{- with .OutputFormats.Get "RSS" }}
+    <atom:link href="{{ .Permalink }}" rel="self" type="application/rss+xml" />
+    {{- end }}
+    {{- range $posts.ByDate.Reverse }}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+      <guid isPermaLink="true">{{ .Permalink }}</guid>
+      {{- with .Params.categories }}<category>{{ index . 0 }}</category>{{ end }}
+      <description>{{ .Summary | plainify }}</description>
+      <content:encoded>{{ printf "<![CDATA[%s]]>" (partial "helper/rss-content.html" .) | safeHTML }}</content:encoded>
+    </item>
+    {{- end }}
+  </channel>
+</rss>

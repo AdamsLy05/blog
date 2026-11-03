@@ -1,0 +1,4 @@
+{{- with .Params.image -}}
+  {{- with $.Resources.GetMatch . -}}<p><img src="{{ .Permalink }}" alt="{{ $.Title }}"></p>{{- end -}}
+{{- end -}}
+{{ .Content }}
