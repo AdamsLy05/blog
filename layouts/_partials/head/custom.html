@@ -392,3 +392,64 @@
   .series-box__list .is-current { font-weight: 600; }
   .series-box__list .is-current a { pointer-events: none; }
 </style>
+
+<style>
+  /* ---------- 移动端目录 ---------- */
+  .mobile-toc { display: none; }
+  @media (max-width: 900px) {
+    .mobile-toc {
+      display: block;
+      margin: 0 0 18px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: var(--card-background, #f7f7f7);
+      font-size: .9rem;
+    }
+    .mobile-toc summary {
+      cursor: pointer;
+      font-weight: 600;
+      list-style: none;
+    }
+    .mobile-toc summary::-webkit-details-marker { display: none; }
+    .mobile-toc ol { margin: 8px 0 0; padding-left: 1.15rem; line-height: 1.9; }
+    .mobile-toc .lvl3 { margin-left: .9rem; font-size: .86rem; opacity: .85; }
+  }
+</style>
+<script>
+  (function () {
+    function buildTOC() {
+      var content = document.querySelector('.article-content');
+      if (!content || content.dataset.tocDone) return;
+      content.dataset.tocDone = '1';
+      var heads = content.querySelectorAll('h2, h3');
+      if (heads.length < 3) return;
+
+      var box = document.createElement('details');
+      box.className = 'mobile-toc';
+      var sum = document.createElement('summary');
+      sum.textContent = '目录 · 共 ' + heads.length + ' 节';
+      box.appendChild(sum);
+
+      var ol = document.createElement('ol');
+      Array.prototype.forEach.call(heads, function (h, i) {
+        if (!h.id) h.id = 'sec-' + i;
+        var li = document.createElement('li');
+        li.className = h.tagName === 'H3' ? 'lvl3' : 'lvl2';
+        var a = document.createElement('a');
+        a.href = '#' + h.id;
+        a.textContent = (h.textContent || '').replace(/^#\s*/, '').trim();
+        a.addEventListener('click', function () { box.open = false; });
+        li.appendChild(a);
+        ol.appendChild(li);
+      });
+      box.appendChild(ol);
+      content.insertBefore(box, content.firstChild);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', buildTOC);
+    } else {
+      buildTOC();
+    }
+    document.addEventListener('astro:page-load', buildTOC);
+  })();
+</script>
