@@ -1,4 +1,4 @@
 ---
 title: 手机
-image: "cover.svg"
+image: "cover.jpg"
 ---

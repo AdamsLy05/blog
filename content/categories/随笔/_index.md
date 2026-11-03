@@ -1,4 +1,4 @@
 ---
 title: 随笔
-image: "cover.svg"
+image: "cover.jpg"
 ---

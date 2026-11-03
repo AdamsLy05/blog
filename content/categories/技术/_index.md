@@ -1,4 +1,4 @@
 ---
 title: 技术
-image: "cover.svg"
+image: "cover.jpg"
 ---
