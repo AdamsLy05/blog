@@ -1,0 +1,18 @@
+{{- $prev := .PrevInSection -}}
+{{- $next := .NextInSection -}}
+{{- if or $prev $next }}
+<nav class="post-nav" aria-label="文章导航">
+  {{- with $prev }}
+  <a class="post-nav__item post-nav__item--prev" href="{{ .RelPermalink }}">
+    <span class="post-nav__label">← 上一篇</span>
+    <span class="post-nav__title">{{ .Title }}</span>
+  </a>
+  {{- end }}
+  {{- with $next }}
+  <a class="post-nav__item post-nav__item--next" href="{{ .RelPermalink }}">
+    <span class="post-nav__label">下一篇 →</span>
+    <span class="post-nav__title">{{ .Title }}</span>
+  </a>
+  {{- end }}
+</nav>
+{{- end }}

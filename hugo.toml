@@ -12,6 +12,17 @@ enableEmoji = true
   tag = "tags"
   series = "series"
 
+[related]
+  includeNewer = true
+  threshold = 60
+  toLower = false
+  [[related.indices]]
+    name = "tags"
+    weight = 100
+  [[related.indices]]
+    name = "categories"
+    weight = 50
+
 [pagination]
   pagerSize = 6
 

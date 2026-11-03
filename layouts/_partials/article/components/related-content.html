@@ -1,0 +1,16 @@
+{{- $self := . -}}
+{{- $cats := .Params.categories | default slice -}}
+{{- $pool := where $self.Site.RegularPages "Params.categories" "intersect" $cats -}}
+{{- $related := first 3 (where $pool "Permalink" "!=" $self.Permalink).ByDate.Reverse -}}
+{{- with $related }}
+<aside class="related-posts">
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            {{ range . }}
+                {{ partial "article-list/tile" . }}
+            {{ end }}
+        </div>
+    </div>
+</aside>
+{{ end }}
