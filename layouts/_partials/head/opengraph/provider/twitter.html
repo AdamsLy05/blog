@@ -1,0 +1,17 @@
+{{- with .Site.Params.opengraph.twitter.site -}}
+    <meta name="twitter:site" content="@{{ . }}">
+    <meta name="twitter:creator" content="@{{ . }}">
+{{- end -}}
+
+{{- $title := partialCached "data/title" . .RelPermalink -}}
+{{- $description := partialCached "data/description" . .RelPermalink -}}
+
+<meta name="twitter:title" {{ printf "content=%q" $title | safeHTMLAttr }}>
+<meta name="twitter:description" {{ printf "content=%q" $description | safeHTMLAttr }}>
+
+{{- $imgParam := .Params.social_image | default .Params.image | default .Site.Params.social_image -}}
+{{- $image := partial "helper/image" (dict "Image" $imgParam "Resources" .Resources "Context" .) -}}
+{{- if $image -}}
+    <meta name="twitter:card" content="{{ .Site.Params.opengraph.twitter.card }}">
+    <meta name="twitter:image" content='{{ absURL $image.Permalink }}' />
+{{- end -}}
