@@ -61,6 +61,9 @@ enableEmoji = true
     avatar = "img/avatar.jpg"
 
   [params.article]
+    readingTime = true
+    [params.article.list]
+      showTags = true
     [params.article.license]
       enabled = false
     [params.article.headingAnchor]

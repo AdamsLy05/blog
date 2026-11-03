@@ -304,20 +304,6 @@
       var content = document.querySelector('.article-content');
       if (!content) return;
 
-      // 阅读时长（按中文约 400 字/分钟）
-      if (!content.dataset.readingTimeDone) {
-        content.dataset.readingTimeDone = '1';
-        var text = (content.innerText || '').replace(/\s+/g, '');
-        var minutes = Math.max(1, Math.round(text.length / 400));
-        var meta = document.querySelector('.article-footer .post-meta, .article-meta');
-        if (meta) {
-          var span = document.createElement('span');
-          span.className = 'reading-time';
-          span.textContent = '约 ' + minutes + ' 分钟';
-          meta.appendChild(span);
-        }
-      }
-
       // 代码块复制按钮
       content.querySelectorAll('.highlight').forEach(function (block) {
         if (block.querySelector('.copy-code')) return;
