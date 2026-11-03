@@ -37,7 +37,7 @@
     {{- end -}}
 {{- end -}}
 
-{{ $imgParam := .Params.social_image | default .Params.image }}
+{{ $imgParam := .Params.social_image | default .Params.image | default .Site.Params.social_image }}
 {{ $image := partial "helper/image" (dict "Image" $imgParam "Resources" .Resources "Context" .) }}
 {{- if $image -}}
     <meta property='og:image' content='{{ absURL $image.Permalink }}' />

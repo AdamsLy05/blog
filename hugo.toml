@@ -47,6 +47,7 @@ enableEmoji = true
   mainSections = ["post"]
   rssFullContent = true
   favicon = "img/avatar.jpg"
+  social_image = "img/social.jpg"
   dateFormat = { published = "2006 年 01 月 02 日", lastUpdated = "2006 年 01 月 02 日" }
 
   [params.footer]
