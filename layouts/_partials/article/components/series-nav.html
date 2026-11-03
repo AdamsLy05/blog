@@ -1,0 +1,25 @@
+{{- with .Params.series -}}
+{{- $name := index . 0 -}}
+{{- $term := $.Site.GetPage (printf "/series/%s" $name) -}}
+{{- with $term -}}
+{{- $pages := .Pages.ByDate -}}
+{{- $cur := $.RelPermalink -}}
+{{- $total := len $pages -}}
+{{- $idx := 0 -}}
+{{- range $i, $p := $pages -}}{{- if eq $p.RelPermalink $cur -}}{{- $idx = add $i 1 -}}{{- end -}}{{- end -}}
+<aside class="series-box">
+  <div class="series-box__head">
+    <span class="series-box__label">系列</span>
+    <a class="series-box__name" href="{{ $term.RelPermalink }}">{{ $term.Title }}</a>
+    <span class="series-box__count">{{ $idx }} / {{ $total }}</span>
+  </div>
+  <ol class="series-box__list">
+    {{- range $p := $pages }}
+    <li{{ if eq $p.RelPermalink $cur }} class="is-current"{{ end }}>
+      <a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+    </li>
+    {{- end }}
+  </ol>
+</aside>
+{{- end -}}
+{{- end -}}

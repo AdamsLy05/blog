@@ -364,3 +364,31 @@
 {{- with $img }}{{ $ld = merge $ld (dict "image" .) }}{{ end -}}
 <script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
 {{ end }}
+
+<style>
+  /* ---------- 系列导航 ---------- */
+  .series-box {
+    margin: 26px 0 6px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--card-background, #f7f7f7);
+  }
+  .series-box__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: .9rem;
+  }
+  .series-box__label {
+    font-size: .72rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .06);
+  }
+  .series-box__name { font-weight: 600; }
+  .series-box__count { margin-left: auto; opacity: .6; font-size: .78rem; }
+  .series-box__list { margin: 0; padding-left: 1.1rem; font-size: .9rem; line-height: 1.9; }
+  .series-box__list .is-current { font-weight: 600; }
+  .series-box__list .is-current a { pointer-events: none; }
+</style>
