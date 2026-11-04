@@ -497,3 +497,53 @@
     });
   }
 </script>
+
+<style>
+  /* ---------- 系列：索引 ---------- */
+  .series-head { margin: 4px 0 22px; }
+  .series-head__kicker {
+    margin: 0 0 6px; font-size: .75rem; letter-spacing: .18em;
+    text-transform: uppercase; opacity: .55;
+  }
+  .series-head__sub { margin: 8px 0 0; opacity: .72; line-height: 1.7; }
+  .series-head__meta { margin: 10px 0 0; font-size: .82rem; opacity: .5; }
+
+  .series-cards { display: grid; gap: 14px; }
+  .series-card {
+    display: block; padding: 18px 20px; border-radius: 14px;
+    background: var(--card-background, #f7f7f7);
+    text-decoration: none; color: inherit;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .series-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.06); }
+  .series-card__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .series-card__title { margin: 0; font-size: 1.12rem; }
+  .series-card__count { font-size: .78rem; opacity: .55; white-space: nowrap; }
+  .series-card__desc { margin: 8px 0 0; font-size: .9rem; opacity: .7; line-height: 1.7; }
+  .series-card__list {
+    margin: 12px 0 0; padding-left: 1.2rem; font-size: .86rem;
+    line-height: 1.95; opacity: .72;
+  }
+  .series-card__list .more { list-style: none; opacity: .6; margin-left: -1.2rem; }
+
+  /* ---------- 系列：单篇列表 ---------- */
+  .series-posts { list-style: none; margin: 0; padding: 0; }
+  .series-post {
+    display: flex; gap: 14px; padding: 16px 0;
+    border-top: 1px solid rgba(0,0,0,.07);
+  }
+  [data-scheme="dark"] .series-post { border-top-color: rgba(255,255,255,.1); }
+  .series-post:first-child { border-top: none; }
+  .series-post__num {
+    flex: 0 0 28px; height: 28px; margin-top: 2px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: .78rem;
+    background: rgba(0,0,0,.06);
+  }
+  [data-scheme="dark"] .series-post__num { background: rgba(255,255,255,.12); }
+  .series-post__body { min-width: 0; }
+  .series-post__title { margin: 0; font-size: 1.02rem; line-height: 1.5; }
+  .series-post__title a { text-decoration: none; }
+  .series-post__desc { margin: 6px 0 0; font-size: .88rem; opacity: .68; line-height: 1.7; }
+  .series-post__meta { margin: 8px 0 0; font-size: .78rem; opacity: .45; }
+</style>

@@ -1,0 +1,22 @@
+{{- /* 系列的两个页面用中文标题，别用 Hugo 的默认英文复数 */ -}}
+{{- if and (eq .Kind "taxonomy") (eq .Data.Plural "series") -}}
+    {{- return (printf "系列 - %s" .Site.Title) -}}
+{{- end -}}
+{{- if and (eq .Kind "term") (eq .Data.Plural "series") -}}
+    {{- return (printf "%s - %s" .Title .Site.Title) -}}
+{{- end -}}
+
+{{- $pageTitle := .Title -}}
+{{- $siteTitle := .Site.Title -}}
+{{- $paginator := partial "helper/paginator.html" . -}}
+
+{{- $title := slice -}}
+
+{{- if and $paginator $paginator.HasPrev -}}
+    <!-- Add page number-->
+    {{ $title = $title | append (printf "Page %d" $paginator.PageNumber) }}
+{{- end -}}
+
+{{- $title = $title | append (default $siteTitle $pageTitle) -}}
+
+{{ return delimit $title " - " }}

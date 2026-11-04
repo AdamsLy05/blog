@@ -1,0 +1,129 @@
+{{ define "main" }}
+{{- if eq .Data.Plural "series" -}}
+{{- if eq .Kind "taxonomy" -}}
+    <header class="series-head">
+        <h1 class="article-title">系列</h1>
+        <p class="series-head__sub">同一个主题下的几篇，按顺序读更顺。</p>
+    </header>
+
+    <div class="series-cards">
+    {{- range .Pages }}
+        {{- $count := len .Pages -}}
+        <a class="series-card" href="{{ .RelPermalink }}">
+            <div class="series-card__top">
+                <h2 class="series-card__title">{{ .Title }}</h2>
+                <span class="series-card__count">{{ $count }} 篇</span>
+            </div>
+            {{ with .Params.description }}<p class="series-card__desc">{{ . }}</p>{{ end }}
+            <ol class="series-card__list">
+                {{- range first 3 .Pages.ByDate }}
+                <li>{{ .Title }}</li>
+                {{- end }}
+                {{- if gt $count 3 }}<li class="more">……还有 {{ sub $count 3 }} 篇</li>{{ end }}
+            </ol>
+        </a>
+    {{- end }}
+    </div>
+{{- else -}}
+    {{- $posts := .Pages.ByDate -}}
+    {{- $total := len $posts -}}
+    <header class="series-head">
+        <p class="series-head__kicker">系列</p>
+        <h1 class="article-title">{{ .Title }}</h1>
+        {{ with .Params.description }}<p class="series-head__sub">{{ . }}</p>{{ end }}
+        <p class="series-head__meta">{{ $total }} 篇 · 按顺序读</p>
+    </header>
+
+    <ol class="series-posts">
+        {{- range $i, $p := $posts }}
+        <li class="series-post">
+            <span class="series-post__num">{{ add $i 1 }}</span>
+            <div class="series-post__body">
+                <h2 class="series-post__title"><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h2>
+                {{ with $p.Params.description }}<p class="series-post__desc">{{ . }}</p>{{ end }}
+                <p class="series-post__meta">{{ $p.Date.Format "2006-01-02" }}{{ if $p.ReadingTime }} · 约 {{ $p.ReadingTime }} 分钟{{ end }}</p>
+            </div>
+        </li>
+        {{- end }}
+    </ol>
+{{- end -}}
+{{- else -}}
+
+    <header>
+        <h3 class="section-title">
+            {{ if eq .Parent (.GetPage "/") }}
+                {{ T "list.section" }}
+            {{ else }}
+                {{ .Parent.Title }}
+            {{ end }}
+        </h3>
+
+        <div class="section-card">
+            <div class="section-details">
+                <h3 class="section-count">{{ T "list.page" (len .Pages) }}</h3>
+                <h1 class="section-term">{{ .Title }}</h1>
+                {{ with .Params.description }}
+                    <h2 class="section-description">{{ . }}</h2>
+                {{ end }}
+            </div>
+    
+            {{- $image := partial "helper/image" (dict "Image" .Params.image "Resources" .Resources "Context" .) -}}
+            {{ if $image }}
+                <div class="section-image">
+                    {{ partial "helper/thumbnail-image" (dict 
+                        "Resource" $image.Resource
+                        "Width" 60
+                        "Height" 60
+                        "Resize" .Site.Params.ImageProcessing.Thumbnail.Enabled
+                        "Attributes" (dict
+                            "src" $image.Permalink
+                            "alt" .Title
+                            "loading" "lazy"
+                            "width" $image.Width
+                            "height" $image.Height
+                        )
+                    ) }}
+                </div>
+            {{ end }}
+        </div>
+    </header>
+
+    {{- $pages := partial "helper/pages.html" . -}}
+    {{- $subsections := .Sections -}}
+    
+    {{- if and (eq (len $pages) (len $subsections)) (eq $pages $subsections) -}}
+        {{- $subsections = slice -}}
+    {{- end -}}
+
+    {{- with $subsections -}}
+        <aside>
+            <h2 class="section-title">{{ T "list.subsection" (len $subsections) }}</h2>
+            <div class="subsection-list">
+                <div class="article-list--tile">
+                    {{ range . }}
+                        {{ partial "article-list/tile" . }}
+                    {{ end }}
+                </div>
+            </div>
+        </aside>
+    {{- end -}}
+    
+    {{/* List only pages that are not a subsection */}}
+    {{ $paginator := partial "helper/paginator.html" . }}
+    {{ with $paginator }}
+        <section class="article-list--compact">
+            {{ range .Pages }}
+                {{ partial "article-list/compact" . }}
+            {{ end }}
+        </section>
+    {{ end }}
+
+    {{- partial "pagination.html" . -}}
+
+    {{ partialCached "footer/footer" . }}
+{{- end -}}
+{{ end }}
+
+{{ define "right-sidebar" }}
+    {{ partial "sidebar/right.html" (dict "Context" . "Scope" "homepage") }}
+{{ end }}
