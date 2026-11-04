@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://adamsly05.github.io/blog/sitemap.xml

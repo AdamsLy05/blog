@@ -1,0 +1,35 @@
+{
+  "name": "理砚集",
+  "short_name": "理砚集",
+  "description": "在手机上写代码、搭服务器、做产品的记录。",
+  "lang": "zh-CN",
+  "start_url": "/blog/",
+  "scope": "/blog/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#edece7",
+  "theme_color": "#1c2430",
+  "icons": [
+    {
+      "src": "/blog/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/blog/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/blog/img/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

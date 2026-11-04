@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>理砚集</title><link>https://adamsly05.github.io/blog/tags/%E7%8A%B6%E6%80%81/</link><description>记录一点东西，慢慢写</description><language>zh-cn</language><lastBuildDate>Tue, 03 Nov 2026 23:00:00 +0800</lastBuildDate><atom:link href="https://adamsly05.github.io/blog/tags/%E7%8A%B6%E6%80%81/index.xml" rel="self" type="application/rss+xml"/><item><title>把检查塞进发布流程里</title><link>https://adamsly05.github.io/blog/p/ship-checks/</link><pubDate>Tue, 03 Nov 2026 23:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/ship-checks/</guid><category>技术</category><description>上一篇讲了博客上几个"页面正常、功能悄悄坏掉"的洞。修完之后我做的不是继续找洞，而是把找洞这件事交出去。
+第一件：把这些检查写成脚本</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/ship-checks/cover.svg" alt="把检查塞进发布流程里"></p><p>上一篇讲了博客上几个&quot;页面正常、功能悄悄坏掉&quot;的洞。修完之后我做的不是继续找洞，而是把找洞这件事交出去。</p>
+<hr>
+<p><strong>第一件：把这些检查写成脚本</strong></p>
+<ul>
+<li><code>check-blog-links.py</code>：扫构建产物里所有内部链接，这次扫了 1479 个</li>
+<li><code>seo-audit.py</code>：每页检查 <code>h1</code> 数量、标题、描述、canonical、分享图是不是位图且文件存在、JSON-LD 能不能解析</li>
+</ul>
+<p><strong>第二件：接进发布流程</strong></p>
+<p>现在发布是：构建 → 链接检查 → SEO 体检 → 推。任何一项不过，直接中止，不推上去。</p>
+<p>这两步比修那二十个洞更值钱。<strong>洞会一直有，检查可以复用。</strong></p>
+<hr>
+<p>洞会一直有，检查可以复用。所以现在我发布前不看页面，看退出码——<strong>任何一项不过，就不推。</strong></p>
+<p><em>2026-11-03，两个脚本，一条流水线。</em></p>
+
+]]></content:encoded></item><item><title>把一个网页工具搬进手机</title><link>https://adamsly05.github.io/blog/p/uvs-to-app/</link><pubDate>Tue, 03 Nov 2026 21:30:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/uvs-to-app/</guid><category>技术</category><description>UVS Studio 的网页版已经能用了：写一段创意，它拆成结构化需求，再吐提示词和分镜。
+问题是它挂在服务器上。哪天那台机器停了，或者我把它删了，这个每天都要用的工具就没了。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/uvs-to-app/cover.svg" alt="把一个网页工具搬进手机"></p><p>UVS Studio 的网页版已经能用了：写一段创意，它拆成结构化需求，再吐提示词和分镜。</p>
+<p>问题是它挂在服务器上。哪天那台机器停了，或者我把它删了，这个每天都要用的工具就没了。</p>
+<p>所以昨天先写了份计划书，今天把它做成了安卓 App。</p>
+<hr>
+<h2 id="先说选型为什么不套壳"><a href="#%e5%85%88%e8%af%b4%e9%80%89%e5%9e%8b%e4%b8%ba%e4%bb%80%e4%b9%88%e4%b8%8d%e5%a5%97%e5%a3%b3" class="header-anchor"></a>先说选型：为什么不套壳
+</h2><p>&ldquo;套壳&quot;就是用 WebView 打开网页，最省事。三条路我摆了张表：</p>
+<table>
+	<thead>
+			<tr>
+					<th>方案</th>
+					<th>工作量</th>
+					<th>关键问题</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>PWA 加桌面图标</td>
+					<td>几乎为 0</td>
+					<td>服务器一停就废</td>
+			</tr>
+			<tr>
+					<td>WebView 套壳</td>
+					<td>小</td>
+					<td>浏览器 CORS 挡住直连 DeepSeek，得靠原生层转发</td>
+			</tr>
+			<tr>
+					<td>原生 Kotlin</td>
+					<td>中</td>
+					<td>逻辑要重写一遍（约 600 行 TS）</td>
+			</tr>
+	</tbody>
+</table>
+<p>选了原生。理由不是&quot;原生更高级&rdquo;，是<strong>我不想让工具的核心功能挂在别人能关掉的地方</strong>。加上历史记录要能离线翻，套壳那条路两样都做不到。</p>
+<p>顺带一个私心：理砚也是 Kotlin + Compose + Room，同一个技术栈，出问题我知道往哪看。</p>
+<h2 id="真正的风险不是做不出来"><a href="#%e7%9c%9f%e6%ad%a3%e7%9a%84%e9%a3%8e%e9%99%a9%e4%b8%8d%e6%98%af%e5%81%9a%e4%b8%8d%e5%87%ba%e6%9d%a5" class="header-anchor"></a>真正的风险不是&quot;做不出来&quot;
+</h2><p>写代码这一步，我几乎不担心。逻辑简单——输入文本、调一次接口、展示结果，没有相机、没有传感器、没有后台服务。</p>
+<p>真正会出事的是另一件事：<strong>做出来和网页版不一样</strong>。</p>
+<p>提示词是要直接粘到生成平台去的。差一个换行、少一个顿号，效果就可能变。而这种错误特别隐蔽——App 能跑、界面好看、测试全绿，就是你用的时候觉得&quot;怎么没网页版那个味道&quot;。</p>
+<p>所以我定的第一个硬要求是 <strong>golden 测试</strong>：拿五个固定样例，用网页版的实现生成提示词，把字符串存成基准；安卓侧的输出必须一字不差。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">golden 对齐 5/5
+</span></span></code></pre></div><p>这条我没打算只信测试报告。我把用例的 JSON 抽出来，重新跑一遍网页版的实现，跟期望值逐字比对——对上了，才算数。</p>
+<p>计划书里别的都能商量，这条没得让。</p>
+<h2 id="计划书里的天数全删了"><a href="#%e8%ae%a1%e5%88%92%e4%b9%a6%e9%87%8c%e7%9a%84%e5%a4%a9%e6%95%b0%e5%85%a8%e5%88%a0%e4%ba%86" class="header-anchor"></a>计划书里的天数，全删了
+</h2><p>第一版计划书里的排期是：核心链路 3 天、界面 8 天。</p>
+<p>写完回头看，这数字明显不对——我开发上一个 App，前后也就一天。</p>
+<p>问题出在单位：那是&quot;一个人慢慢敲&quot;的人天。而这次真正的瓶颈不在敲代码，在于反复核对输出有没有走样。<strong>人天这个单位在这儿不成立。</strong></p>
+<p>所以把天数全删了，只留 M0 到 M6 的顺序、每个阶段的验收，和那张&quot;Web 版文件 → Android 文件&quot;的对照表。</p>
+<h2 id="一天80-个测试"><a href="#%e4%b8%80%e5%a4%a980-%e4%b8%aa%e6%b5%8b%e8%af%95" class="header-anchor"></a>一天，80 个测试
+</h2><p>结果：55 个文件、6000 多行，<code>./gradlew test</code> 跑了 80 个用例，debug 和 release 两套都过。</p>
+<p>真机上装了，用起来没问题。</p>
+<p>代码写完，重点核了三处：</p>
+<ul>
+<li><strong>Key 有没有硬编码</strong>：没有，走 AndroidKeyStore 的 AES-GCM 加密，全项目只有一个类读它</li>
+<li><strong>日志会不会漏 Key</strong>：一行 <code>Log</code> 都没有</li>
+<li><strong>规则有没有漏</strong>：R2 到 R7 的报错文本和网页版一字不差——这段文字会原样回灌给模型做修复，差一个字都会让它修歪</li>
+</ul>
+<h2 id="定验收比写代码难"><a href="#%e5%ae%9a%e9%aa%8c%e6%94%b6%e6%af%94%e5%86%99%e4%bb%a3%e7%a0%81%e9%9a%be" class="header-anchor"></a>定验收比写代码难
+</h2><p>回头看，这次真正决定成败的动作只有两个：</p>
+<ol>
+<li><strong>定验收</strong>——什么算做完了。这次就是那句&quot;golden 不通过，不许碰界面&quot;</li>
+<li><strong>判断取舍</strong>——套壳还是原生、先做什么后做什么</li>
+</ol>
+<p>这两个定错了，代码写得再快也是白跑。而定它们花不了多少时间，所以才容易被人跳过。</p>
+<h2 id="留下的问题"><a href="#%e7%95%99%e4%b8%8b%e7%9a%84%e9%97%ae%e9%a2%98" class="header-anchor"></a>留下的问题
+</h2><p>参考图/首帧还没做。手机上这块其实比网页版顺手——相机现成的，拍一张就是参考，不用来回传文件。</p>
+<p>下一步应该做这个。</p>
+<hr>
+<p><em>2026-11-03，App 装上了，计划书里的天数被我删了。</em></p>
+
+]]></content:encoded></item><item><title>那条异常登录告警，是我自己</title><link>https://adamsly05.github.io/blog/p/alert/</link><pubDate>Tue, 03 Nov 2026 21:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/alert/</guid><category>随笔</category><description>早上打开手机，看到安全中心一条告警：
+异常登录 - ECS 在非常用地登录
+时间、IP、账号都列着。先说结论：是我自己的手机，虚惊一场。下面是查的过程——结论没什么用，方法有用。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/alert/cover.svg" alt="那条异常登录告警，是我自己"></p><p>早上打开手机，看到安全中心一条告警：</p>
+
+    <blockquote>
+        <p>异常登录 - ECS 在非常用地登录</p>
+
+    </blockquote>
+<p>时间、IP、账号都列着。先说结论：是我自己的手机，虚惊一场。下面是查的过程——结论没什么用，方法有用。</p>
+<h2 id="要确认的只有一件事"><a href="#%e8%a6%81%e7%a1%ae%e8%ae%a4%e7%9a%84%e5%8f%aa%e6%9c%89%e4%b8%80%e4%bb%b6%e4%ba%8b" class="header-anchor"></a>要确认的只有一件事
+</h2><p>告警给了登录记录：IP、22 端口、root、09:32。</p>
+<p>需要确认的是这次登录用的是不是我这把钥匙。SSH 公钥登录会留指纹：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">grep <span class="s1">&#39;Accepted publickey&#39;</span> /var/log/auth.log <span class="p">|</span> tail -5
+</span></span></code></pre></div><p>09:30 那条记录的指纹是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ED25519 SHA256:RBDqOKmRPIgxlWjssSwniXaEQ/3K4LWeJ03I1CX5pjw
+</span></span></code></pre></div><p>再对一下服务器上唯一授权的那把：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">ssh-keygen -lf ~/.ssh/authorized_keys
+</span></span></code></pre></div><p>两者一致。</p>
+<h2 id="为什么被判成异地"><a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e8%a2%ab%e5%88%a4%e6%88%90%e5%bc%82%e5%9c%b0" class="header-anchor"></a>为什么被判成异地
+</h2><p>IP 从 <code>111.183.145.139</code> 变成了 <code>111.183.148.74</code>。</p>
+<p>查归属：都是湖北武汉、都是中国电信、同一个自治域 <code>AS131285</code>（湖北 5G）。只是移动网络重新分配了地址段——换基站、开关飞行模式、Wi-Fi 切 5G 都会这样。</p>
+<p>安全中心按「登录位置基线」判断，IP 段一变就触发。这是它的正常工作方式，不是故障。</p>
+<h2 id="顺手核对了三件事"><a href="#%e9%a1%ba%e6%89%8b%e6%a0%b8%e5%af%b9%e4%ba%86%e4%b8%89%e4%bb%b6%e4%ba%8b" class="header-anchor"></a>顺手核对了三件事
+</h2><ol>
+<li><strong>密码登录</strong>：<code>sshd -T</code> 确认是 <code>no</code></li>
+<li><strong>账号</strong>：只有 <code>admin</code>，密码是锁的，从没登录过</li>
+<li><strong>cron</strong>：只有系统自带的两个</li>
+</ol>
+<p>日志里还有一条 05:16 的扫描器在试用户名。这种每天都有，密码登录关着就不用管。</p>
+<h2 id="以后再看到这类告警"><a href="#%e4%bb%a5%e5%90%8e%e5%86%8d%e7%9c%8b%e5%88%b0%e8%bf%99%e7%b1%bb%e5%91%8a%e8%ad%a6" class="header-anchor"></a>以后再看到这类告警
+</h2><p>不看 IP，按顺序看三样：</p>
+<ol>
+<li><strong>公钥指纹</strong>是不是我这把</li>
+<li><strong>登录方式</strong>是 <code>publickey</code> 还是 <code>password</code>——后者才是真问题</li>
+<li><strong>登录之后做了什么</strong>：有没有新建用户、改 cron、开端口</li>
+</ol>
+<p>IP 反而不重要：它是运营商分配的，天天在变。</p>
+<p>告警本身没有错，它确实看到了一次没见过的位置。是我一开始把「异常」两个字当成了结论。</p>
+<p><em>2026-11-03，核对完，虚惊一场。</em></p>
+
+]]></content:encoded></item><item><title>在服务器上开个文件中转站</title><link>https://adamsly05.github.io/blog/p/file-relay/</link><pubDate>Tue, 03 Nov 2026 20:30:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/file-relay/</guid><category>技术</category><description>需求很朴素：手机和电脑之间传文件。
+听起来是件早就被解决的事。但真到自己身上，会发现问题不在"能不能传"，在"要不要为这件事多开一个 App、多登一个账号、多记一套密码"。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/file-relay/cover.svg" alt="在服务器上开个文件中转站"></p><p>需求很朴素：手机和电脑之间传文件。</p>
+<p>听起来是件早就被解决的事。但真到自己身上，会发现问题不在&quot;能不能传&quot;，在&quot;要不要为这件事多开一个 App、多登一个账号、多记一套密码&quot;。</p>
+<hr>
+<h2 id="先看看现成的"><a href="#%e5%85%88%e7%9c%8b%e7%9c%8b%e7%8e%b0%e6%88%90%e7%9a%84" class="header-anchor"></a>先看看现成的
+</h2><p>一条条试：</p>
+<ul>
+<li><strong>微信/QQ 传文件</strong>：能传，但经过谁、存多久、压缩不压缩，你说了不算。而且手机上想传到电脑，得先找到一个愿意接收的会话</li>
+<li><strong>网盘</strong>：要登录、要同步、要大。</li>
+<li><strong>同一 WiFi 下的 LocalSend</strong>：体验最好，点对点直连，不过服务器。<strong>但只在同一个网络里有用</strong></li>
+<li><strong>croc</strong>：命令行一行搞定，端到端加密，跨网络也行。适合偶尔传一个文件</li>
+</ul>
+<p>这些都不错。问题是我手边正好有一台 7×24 开着的服务器，不用它反而有点浪费。</p>
+<h2 id="所以搭了个中转"><a href="#%e6%89%80%e4%bb%a5%e6%90%ad%e4%ba%86%e4%b8%aa%e4%b8%ad%e8%bd%ac" class="header-anchor"></a>所以搭了个中转
+</h2><p><code>dufs</code>，一个 2MB 的单文件 HTTP 服务。特性刚好：</p>
+<ul>
+<li>拖拽上传、点一下就下载</li>
+<li>支持删、支持把整个文件夹打包下载</li>
+<li>有 Basic Auth</li>
+<li><strong>可以只监听 127.0.0.1</strong></li>
+</ul>
+<p>最后一条是关键。只监听本机，公网就碰不到它，要用的时候从自己电脑开一条 SSH 隧道过去：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">ssh -N -L 5200:127.0.0.1:5200 root@服务器
+</span></span></code></pre></div><p>然后浏览器开 <code>127.0.0.1:5200</code>，就是个能拖文件的网页。</p>
+<p>用完把隧道一关，服务就当不存在。</p>
+<h2 id="但它不是最优解"><a href="#%e4%bd%86%e5%ae%83%e4%b8%8d%e6%98%af%e6%9c%80%e4%bc%98%e8%a7%a3" class="header-anchor"></a>但它不是最优解
+</h2><p><strong>文件要先经过一台不属于我的机器</strong>——虽然是自己的服务器，但它在云上，中间多了一道不该有的环节。</p>
+<p>按场景分，其实应该是这样：</p>
+<table>
+	<thead>
+			<tr>
+					<th>场景</th>
+					<th>用什么</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>手机 ↔ 电脑，同一个 WiFi</td>
+					<td>LocalSend，直连，最快</td>
+			</tr>
+			<tr>
+					<td>跨网络传一个文件</td>
+					<td>croc，一行命令</td>
+			</tr>
+			<tr>
+					<td>想要&quot;随手一扔&quot;的固定入口</td>
+					<td>服务器中转</td>
+			</tr>
+			<tr>
+					<td>长期想省心</td>
+					<td>Tailscale 组网，之后所有服务都不用开隧道</td>
+			</tr>
+	</tbody>
+</table>
+<p>最后那条才是真正的解。它不是&quot;传文件工具&quot;，是把几台设备变成一个局域网——之后不管是文件、还是网页、还是数据库，都不用再考虑&quot;怎么连过去&quot;。</p>
+<p>我用中转，是因为它今天就能用，不需要在三个设备上装客户端、登同一个账号。</p>
+<p>这是图省事，不是最优解。</p>
+<h2 id="一个容易忽略的细节"><a href="#%e4%b8%80%e4%b8%aa%e5%ae%b9%e6%98%93%e5%bf%bd%e7%95%a5%e7%9a%84%e7%bb%86%e8%8a%82" class="header-anchor"></a>一个容易忽略的细节
+</h2><p>服务跑起来之后，我第一件事不是试着上传，是<strong>测试没密码能不能进</strong>。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">无密码访问 401
+</span></span></code></pre></div><p>401 才对。这种&quot;默认应该是拒绝&quot;的东西，最好在放文件之前就验一遍，而不是等哪天发现目录里多了看不懂的文件。</p>
+<hr>
+<p><em>2026-11-03，隧道一关，它就不存在。</em></p>
+
+]]></content:encoded></item><item><title>二十个洞，一个都没报错</title><link>https://adamsly05.github.io/blog/p/silent-bugs/</link><pubDate>Tue, 03 Nov 2026 20:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/silent-bugs/</guid><category>技术</category><description>给博客做了一轮体检，一天之内补了二十来个洞。
+最值得说的不是补了什么，是这些洞的共性：页面看起来都是好的，功能悄悄不工作。
+第一个洞：搜索框根本没渲染 主题自带搜索，我想当然以为它在那儿。实际上首页压根没有搜索框。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/silent-bugs/cover.svg" alt="二十个洞，一个都没报错"></p><p>给博客做了一轮体检，一天之内补了二十来个洞。</p>
+<p>最值得说的不是补了什么，是这些洞的共性：<strong>页面看起来都是好的，功能悄悄不工作。</strong></p>
+<hr>
+<h2 id="第一个洞搜索框根本没渲染"><a href="#%e7%ac%ac%e4%b8%80%e4%b8%aa%e6%b4%9e%e6%90%9c%e7%b4%a2%e6%a1%86%e6%a0%b9%e6%9c%ac%e6%b2%a1%e6%b8%b2%e6%9f%93" class="header-anchor"></a>第一个洞：搜索框根本没渲染
+</h2><p>主题自带搜索，我想当然以为它在那儿。实际上首页压根没有搜索框。</p>
+<p>原因很简单：主题的搜索部件要找一个 <code>layout: search</code> 的页面，找不到就 <code>warnf</code> 一下，然后什么都不输出。构建日志里确实有这行警告，但它不影响构建成功——所以没人看见。</p>
+<p>补上一个页面，搜索就回来了。</p>
+<p><strong>教训一：构建&quot;成功&quot;不等于页面&quot;完整&quot;。</strong> 警告要么处理，要么明确决定不处理，不能当噪音。</p>
+<h2 id="第二个洞rss-只有一条"><a href="#%e7%ac%ac%e4%ba%8c%e4%b8%aa%e6%b4%9erss-%e5%8f%aa%e6%9c%89%e4%b8%80%e6%9d%a1" class="header-anchor"></a>第二个洞：RSS 只有一条
+</h2><p><code>/index.xml</code> 能打开，格式合法，看起来正常。实际只有 1 条，而站上有 12 篇。</p>
+<p>主题的 RSS 模板取的是分页后的首页集合，被分页大小截断了。换成&quot;取全部文章&quot;的模板，12 条齐了，还是全文输出。</p>
+<p><strong>教训二：订阅源这种东西，没人点开看，但它坏了你永远不知道。</strong></p>
+<h2 id="第三个洞404-页的标题是空的"><a href="#%e7%ac%ac%e4%b8%89%e4%b8%aa%e6%b4%9e404-%e9%a1%b5%e7%9a%84%e6%a0%87%e9%a2%98%e6%98%af%e7%a9%ba%e7%9a%84" class="header-anchor"></a>第三个洞：404 页的标题是空的
+</h2><p>不是样式问题，是<strong>翻译返回了空字符串</strong>。</p>
+<p>语言标的是 <code>zh-cn</code>，主题的翻译文件叫 <code>zh.toml</code>，两边对不上，<code>T</code> 函数安静地返回空。于是 404 页上有两个空标题，归档页的&quot;分类&quot;也是空白。</p>
+<p>补一个 <code>i18n/zh-cn.toml</code> 就好了。</p>
+<p><strong>教训三：i18n 缺 key 不报错，直接给你空字符串。</strong> 这种&quot;静默降级&quot;是最难发现的，因为页面不崩。</p>
+<h2 id="第四个洞分享了没图"><a href="#%e7%ac%ac%e5%9b%9b%e4%b8%aa%e6%b4%9e%e5%88%86%e4%ba%ab%e4%ba%86%e6%b2%a1%e5%9b%be" class="header-anchor"></a>第四个洞：分享了没图
+</h2><p><code>og:image</code> 配好了，是封面。封面是 SVG。</p>
+<p>然后你把它发到微信里，<strong>没有预览图</strong>——因为大部分平台不渲染 SVG 当预览图。twitter 卡片那张更彻底，我改完 og 忘了它，还是 SVG。</p>
+<p>全换成 1200×630 的 JPEG，28KB，两处都换。</p>
+<p><strong>教训四：同一个数据有两个消费方时，改一个必然漏一个。</strong></p>
+<h2 id="还有标题层级"><a href="#%e8%bf%98%e6%9c%89%e6%a0%87%e9%a2%98%e5%b1%82%e7%ba%a7" class="header-anchor"></a>还有：标题层级
+</h2><p>文章页的标题是 <code>h2</code>，<code>h1</code> 给了站名。从 HTML 语义和 SEO 看都不对。</p>
+<p>改成文章页 <code>h1</code> 是标题、侧边栏站名降级成 <code>div</code>。现在每页恰好一个 <code>h1</code>。</p>
+<hr>
+<p>这些洞的共性是：<strong>页面都好好地开着，只是某个功能悄悄不工作。</strong> 所以它们不会被报错发现，只能靠一样一样去点。</p>
+<p>下一篇说这些洞怎么被自动化挡住的：<a class="link" href="/p/ship-checks/" >《把检查塞进发布流程里》</a>。</p>
+<p><em>2026-11-03，四个洞，一个都没报错。</em></p>
+
+]]></content:encoded></item><item><title>给手机配一台服务器</title><link>https://adamsly05.github.io/blog/p/server-for-phone/</link><pubDate>Mon, 02 Nov 2026 23:30:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/server-for-phone/</guid><category>技术</category><description>上一篇写手机跑 Next.js，结尾留了一句判断：手机适合「做完就走」的项目，不适合「一直挂着」的项目——后者还是交给一台真正的服务器。
+写完就去买了。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/server-for-phone/cover.svg" alt="给手机配一台服务器"></p><p>上一篇写手机跑 Next.js，结尾留了一句判断：手机适合「做完就走」的项目，不适合「一直挂着」的项目——后者还是交给一台真正的服务器。</p>
+<p>写完就去买了。</p>
+<hr>
+<h2 id="为什么不能一直用手机"><a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e4%b8%8d%e8%83%bd%e4%b8%80%e7%9b%b4%e7%94%a8%e6%89%8b%e6%9c%ba" class="header-anchor"></a>为什么不能一直用手机
+</h2><p>手机上的服务有个致命弱点：它不是「一直」的。</p>
+<p>清掉后台，进程就没了；锁屏久了，系统开始省电；重启一次，一切从头。我在手机上加了个胶囊按钮，点一下拉起服务——能用，但那本质上是<strong>人在替系统做看守</strong>。</p>
+<p>人不可能一直看守。</p>
+<h2 id="选型三个不"><a href="#%e9%80%89%e5%9e%8b%e4%b8%89%e4%b8%aa%e4%b8%8d" class="header-anchor"></a>选型：三个「不」
+</h2><ul>
+<li><strong>不租 ECS。</strong> 个人用不上弹性计算，资源包和计费方式都是给企业准备的。</li>
+<li><strong>不装面板。</strong> 宝塔、1Panel 这类，吃内存、开一堆端口、把管理界面暴露在公网上。我宁可多敲几条命令。</li>
+<li><strong>不挂域名。</strong> <code>github.io</code> 够用，国内访问不稳再说。</li>
+</ul>
+<p>最后选的是轻量应用服务器，Ubuntu 24.04。</p>
+<h2 id="现在的配置"><a href="#%e7%8e%b0%e5%9c%a8%e7%9a%84%e9%85%8d%e7%bd%ae" class="header-anchor"></a>现在的配置
+</h2><table>
+	<thead>
+			<tr>
+					<th>项目</th>
+					<th>值</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>系统</td>
+					<td>Ubuntu 24.04.2 LTS</td>
+			</tr>
+			<tr>
+					<td>CPU</td>
+					<td>2 核</td>
+			</tr>
+			<tr>
+					<td>内存</td>
+					<td>4G（实际可用 3.4G）</td>
+			</tr>
+			<tr>
+					<td>磁盘</td>
+					<td>49G，已用 7G</td>
+			</tr>
+			<tr>
+					<td>Swap</td>
+					<td>1G</td>
+			</tr>
+			<tr>
+					<td>Node</td>
+					<td>v24.22.2</td>
+			</tr>
+			<tr>
+					<td>dsh</td>
+					<td>0.2.1-rc.5</td>
+			</tr>
+	</tbody>
+</table>
+<p>对一台只跑引擎和偶尔装点东西的机器来说，够用，而且很够用。真正吃资源的从来不是服务本身，是中间那几次 <code>npm install</code>。</p>
+<h2 id="踩过的三个坑"><a href="#%e8%b8%a9%e8%bf%87%e7%9a%84%e4%b8%89%e4%b8%aa%e5%9d%91" class="header-anchor"></a>踩过的三个坑
+</h2><h3 id="一控制台默认杭州"><a href="#%e4%b8%80%e6%8e%a7%e5%88%b6%e5%8f%b0%e9%bb%98%e8%ae%a4%e6%9d%ad%e5%b7%9e" class="header-anchor"></a>一、控制台默认杭州
+</h3><p>买的是华中1（武汉）。打开控制台，实例列表是空的。</p>
+<p>第一反应是「没买成功」，差点重复下单。切了地域才看到机器在那儿躺着。</p>
+<p>控制台默认拉的是杭州，而这个默认值不写在任何显眼的地方。</p>
+<h3 id="二4g-不是-4g"><a href="#%e4%ba%8c4g-%e4%b8%8d%e6%98%af-4g" class="header-anchor"></a>二、4G 不是 4G
+</h3><p><code>free -h</code> 显示总数 3.4G。剩下的被内核、驱动和云厂商的 agent 占了。</p>
+<p>所以加了 1G swap。<strong>它不是为了跑得快，是为了别把 SSH 挤死。</strong> 内存打满的时候，如果连登录都进不去，那就不是性能问题，是失联。</p>
+<h3 id="三文档和现实对不上"><a href="#%e4%b8%89%e6%96%87%e6%a1%a3%e5%92%8c%e7%8e%b0%e5%ae%9e%e5%af%b9%e4%b8%8d%e4%b8%8a" class="header-anchor"></a>三、文档和现实对不上
+</h3><p>这条最该写。</p>
+<p>交接文档里我一直写着「只走密钥登录」「22 不暴露公网」。今天顺手核了一遍实际配置：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PasswordAuthentication yes
+</span></span><span class="line"><span class="cl">PermitRootLogin yes
+</span></span></code></pre></div><p>一条都没关。</p>
+<p>结论不是「文档没用」，而是——<strong>文档记录的是意图，机器上跑的是事实，中间必须有人去对一次。</strong> 这次对出来了，改天关掉。</p>
+<h2 id="它现在干什么"><a href="#%e5%ae%83%e7%8e%b0%e5%9c%a8%e5%b9%b2%e4%bb%80%e4%b9%88" class="header-anchor"></a>它现在干什么
+</h2><p>跑一个 dsh 引擎，Web 界面只监听 <code>127.0.0.1</code>，外面直接进不来；我要用的时候从手机连过去。</p>
+<p>好处很朴素：手机可以锁屏、可以清后台、可以扔在一边。服务还活着。</p>
+<h2 id="一点判断"><a href="#%e4%b8%80%e7%82%b9%e5%88%a4%e6%96%ad" class="header-anchor"></a>一点判断
+</h2><p>有一条比所有技术细节都重要：<strong>别把唯一的数据放在这台机器上。</strong></p>
+<p>它的价值是「验证」——验证常驻服务该怎么跑、怎么守着、怎么不添乱。不是「承载」。等哪天它变成承载了，就该认真考虑换个安置方式。</p>
+<hr>
+<p><em>2026-11-02，配置记下了，密码登录还没关。</em></p>
+
+]]></content:encoded></item><item><title>在手机上写一个 Next.js 全栈</title><link>https://adamsly05.github.io/blog/p/nextjs-on-android/</link><pubDate>Mon, 02 Nov 2026 19:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/nextjs-on-android/</guid><category>手机</category><description>之前这个博客是用 Hugo 在手机上做的——构建一次不到一秒，因为它是静态生成，产物就是一堆 HTML。
+这次做 UVS Studio 不一样：它需要服务端（API Key 不能放前端），于是要在手机上跑一个常驻的 Node 服务。同一个环境，难度上了一个台阶。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/nextjs-on-android/cover.svg" alt="在手机上写一个 Next.js 全栈"></p><p>之前这个博客是用 Hugo 在手机上做的——构建一次不到一秒，因为它是静态生成，产物就是一堆 HTML。</p>
+<p>这次做 UVS Studio 不一样：它需要服务端（API Key 不能放前端），于是要在手机上跑一个常驻的 Node 服务。同一个环境，难度上了一个台阶。</p>
+<hr>
+<h2 id="装依赖第一次就翻车"><a href="#%e8%a3%85%e4%be%9d%e8%b5%96%e7%ac%ac%e4%b8%80%e6%ac%a1%e5%b0%b1%e7%bf%bb%e8%bd%a6" class="header-anchor"></a>装依赖：第一次就翻车
+</h2><p><code>npm install</code> 跑了 58 秒，装了 113 个包。看起来正常。</p>
+<p>但上一次失败了，报的是 <code>ENOTEMPTY: directory not empty</code>——删不掉旧目录。原因是之前有个后台进程还在写 <code>node_modules</code>，两个进程打架。</p>
+<p>更麻烦的是，删都删不干净：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">rm -rf node_modules
+</span></span><span class="line"><span class="cl"><span class="c1"># rm: cannot remove &#39;node_modules/next/dist/server&#39;: Directory not empty</span>
+</span></span></code></pre></div><p>在 proot 环境里（用 <code>--link2symlink</code> 做硬链接模拟），普通 <code>rm -rf</code> 会卡在这种&quot;删了又像没删&quot;的状态。最后的解法是：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">find node_modules -depth -delete
+</span></span></code></pre></div><p><code>-depth</code> 让子文件先删，父目录最后删，绕开了链接计数的问题。</p>
+<p>这条经验值钱——<strong>在手机上开发，失败往往不是代码问题，是环境问题</strong>。</p>
+<hr>
+<h2 id="构建能用但慢"><a href="#%e6%9e%84%e5%bb%ba%e8%83%bd%e7%94%a8%e4%bd%86%e6%85%a2" class="header-anchor"></a>构建：能用，但慢
+</h2><table>
+	<thead>
+			<tr>
+					<th>项目</th>
+					<th>耗时/体积</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>npm install</code></td>
+					<td>58 秒，339 MB</td>
+			</tr>
+			<tr>
+					<td><code>next build</code></td>
+					<td>约 40 秒，62 MB</td>
+			</tr>
+			<tr>
+					<td><code>tsc --noEmit</code></td>
+					<td>约 15 秒</td>
+			</tr>
+	</tbody>
+</table>
+<p>能跑，但每次改动都要等。手机上做前端，最大的成本不是算力，是<strong>反馈延迟</strong>——你改一行样式，想看一眼效果，得先等构建。</p>
+<hr>
+<h2 id="服务要常驻这是新问题"><a href="#%e6%9c%8d%e5%8a%a1%e8%a6%81%e5%b8%b8%e9%a9%bb%e8%bf%99%e6%98%af%e6%96%b0%e9%97%ae%e9%a2%98" class="header-anchor"></a>服务要常驻，这是新问题
+</h2><p>静态站不需要&quot;服务&quot;，文件在那儿就能看。Next 不行，得有个进程一直跑着。</p>
+<p>手机上这意味着：</p>
+<ul>
+<li>浏览器打开 <code>http://127.0.0.1:3000</code> 才能用</li>
+<li><strong>清掉 DSH 的后台，服务就没了</strong></li>
+<li>手机重启，一切从头</li>
+</ul>
+<p>解决方式是写了个小插件：输入框上方加一个「启动 UVS」胶囊，点一下拉起服务。总比每次手动敲命令强。</p>
+<p>顺带发现，服务监听的是所有网卡，所以<strong>同一个 WiFi 下别的设备也能访问</strong>（用手机的内网 IP:3000）。这让它勉强算个&quot;局域网可用&quot;的服务。</p>
+<hr>
+<h2 id="那些本来应该很简单的坑"><a href="#%e9%82%a3%e4%ba%9b%e6%9c%ac%e6%9d%a5%e5%ba%94%e8%af%a5%e5%be%88%e7%ae%80%e5%8d%95%e7%9a%84%e5%9d%91" class="header-anchor"></a>那些&quot;本来应该很简单&quot;的坑
+</h2><p><strong>一、子路径。</strong></p>
+<p>站点如果挂在 <code>/blog/</code> 这种子路径下，所有绝对路径的资源都会 404。CSS 加载不出来的时候，页面长得像&quot;主题不适配手机&quot;，其实是样式表根本没加载。</p>
+<p><strong>二、缓存。</strong></p>
+<p>改了代码，手机上一看没变化，先怀疑缓存。加个 <code>?v=2</code> 再判断。</p>
+<p><strong>三、LibreOffice 跑不起来。</strong></p>
+<p>想转换一个 <code>.doc</code> 文件，装了 LibreOffice，结果转换命令直接失败：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ERROR: /proc not mounted - LibreOffice is unlikely to work well
+</span></span></code></pre></div><p><code>--version</code> 能跑，但一转换就静默退出。proot 环境下它对 <code>/proc</code> 的依赖没法满足。</p>
+<p>最后的替代方案不是找更好的工具，而是<strong>换思路</strong>：用代码直接生成文档，绕开转换。</p>
+<hr>
+<h2 id="现在这个工具长什么样"><a href="#%e7%8e%b0%e5%9c%a8%e8%bf%99%e4%b8%aa%e5%b7%a5%e5%85%b7%e9%95%bf%e4%bb%80%e4%b9%88%e6%a0%b7" class="header-anchor"></a>现在这个工具长什么样
+</h2><p>一个能在手机上跑的 Next.js 应用：</p>
+<ul>
+<li>前端：React 19 + Tailwind，四个页面</li>
+<li>后端：两个 API 路由，调用 DeepSeek</li>
+<li>数据：历史记录存在浏览器 IndexedDB，服务端不存任何东西</li>
+<li>部署：本机 <code>next start</code>，靠插件一键拉起</li>
+</ul>
+<p>它不是玩具——真的在用，每天解析几条创意。但它也确实<strong>只适合一个人、一台设备</strong>。</p>
+<hr>
+<h2 id="一点判断"><a href="#%e4%b8%80%e7%82%b9%e5%88%a4%e6%96%ad" class="header-anchor"></a>一点判断
+</h2><p>手机能不能当开发机？</p>
+<p><strong>能，但要有心理准备：你花在环境上的时间会超过花在代码上的时间。</strong></p>
+<p>静态站是个甜蜜点——构建快、无需常驻、随便托管。一旦需要服务端、需要数据库、需要守护进程，手机就开始吃力了。</p>
+<p>我现在的结论是：<strong>手机适合&quot;做完就走&quot;的项目，不适合&quot;一直挂着&quot;的项目。</strong> 后者还是交给一台真正的服务器。</p>
+<p><em>2026-11-02，UVS Studio 能跑起来的第 1 天。</em></p>
+
+]]></content:encoded></item><item><title>同一份数据，只能有一个真相</title><link>https://adamsly05.github.io/blog/p/single-source/</link><pubDate>Mon, 02 Nov 2026 16:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/single-source/</guid><category>技术</category><description>UVS Studio 要产出四样东西：结构化 JSON、中文提示词、分镜时间轴、平台适配说明。
+一开始我很自然地想：让模型一次全写了吧，反正它都能写。
+结果第一版就露馅了。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/single-source/cover.svg" alt="同一份数据，只能有一个真相"></p><p>UVS Studio 要产出四样东西：结构化 JSON、中文提示词、分镜时间轴、平台适配说明。</p>
+<p>一开始我很自然地想：<strong>让模型一次全写了吧</strong>，反正它都能写。</p>
+<p>结果第一版就露馅了。</p>
+<hr>
+<h2 id="矛盾是怎么来的"><a href="#%e7%9f%9b%e7%9b%be%e6%98%af%e6%80%8e%e4%b9%88%e6%9d%a5%e7%9a%84" class="header-anchor"></a>矛盾是怎么来的
+</h2><p>用户要 5 秒。JSON 里 <code>durationSec: 5</code>，但提示词里写着&quot;约 10 秒的画面&quot;。分镜表的时间轴是 0–5 秒，提示词却在描述三段镜头。</p>
+<p>每一处都不算错，合起来就是错的。</p>
+<p>原因很简单：<strong>这是四次独立的生成</strong>。模型不知道 JSON 里写了什么，它只是在扮演&quot;写提示词的人&quot;。上下文再长，也不如一句确定的字段可靠。</p>
+<hr>
+<h2 id="换个分工"><a href="#%e6%8d%a2%e4%b8%aa%e5%88%86%e5%b7%a5" class="header-anchor"></a>换个分工
+</h2><p>我改成：<strong>模型只负责&quot;理解&quot;，不负责&quot;表述&quot;</strong>。</p>
+<ul>
+<li>模型干一件事：把自然语言变成 JSON（这是它擅长的，也是必须的）</li>
+<li>其余三样，全部由代码从 JSON 派生</li>
+</ul>
+<p>提示词是模板拼出来的：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">5 秒竖屏（9:16）。
+</span></span><span class="line"><span class="cl">场景：夜晚，下雨，便利店靠窗的柜台。
+</span></span><span class="line"><span class="cl">主体：橘色短毛猫，体态偏胖，趴在玻璃柜台后。
+</span></span><span class="line"><span class="cl">镜头：特写，推轨，缓慢推近。
+</span></span><span class="line"><span class="cl">光线：柔光、侧光、暖调。
+</span></span><span class="line"><span class="cl">分镜顺序：1. 0–2 秒：全景… 2. 2–5 秒：特写…
+</span></span><span class="line"><span class="cl">要求：不要真人；不要出现品牌标识。
+</span></span></code></pre></div><p>分镜表就是 <code>timeline</code> 数组渲染成表格。适配说明是查表。</p>
+<hr>
+<h2 id="这样做换来了什么"><a href="#%e8%bf%99%e6%a0%b7%e5%81%9a%e6%8d%a2%e6%9d%a5%e4%ba%86%e4%bb%80%e4%b9%88" class="header-anchor"></a>这样做换来了什么
+</h2><p><strong>一、不可能矛盾。</strong> 提示词里的每个数字都来自 JSON，改时长就是改一处，不会漏。</p>
+<p><strong>二、不花钱。</strong> 从 JSON 到提示词零成本，用户点一次不需要等模型。</p>
+<p><strong>三、可预测。</strong> 同一个 JSON 永远生成同一段提示词。模型那边你再怎么调温度，这边都不会变。</p>
+<p>代价是<strong>文风僵硬</strong>。模板拼出来的句子是&quot;零件式&quot;的，读起来像一个填好的表格，不像人话。</p>
+<p>我认为这个代价值得——<strong>提示词是给机器看的，不是给人看的</strong>。机器不在乎文采，在乎准确。</p>
+<hr>
+<h2 id="那英文版怎么办"><a href="#%e9%82%a3%e8%8b%b1%e6%96%87%e7%89%88%e6%80%8e%e4%b9%88%e5%8a%9e" class="header-anchor"></a>那英文版怎么办
+</h2><p>英文提示词确实需要翻译，这部分我交给模型，但加了明确约束：</p>
+
+    <blockquote>
+        <p>不要逐字直译；使用行业通用术语（close-up / dolly-in / soft light）；时长画幅照原样保留；所有硬性要求完整译出。</p>
+
+    </blockquote>
+<p>这一步是有边界的：<strong>只翻译一段已经确定的文本，不让它参与创作</strong>。翻错了可以看出，编错了看不出来。</p>
+<hr>
+<h2 id="一个更普遍的原则"><a href="#%e4%b8%80%e4%b8%aa%e6%9b%b4%e6%99%ae%e9%81%8d%e7%9a%84%e5%8e%9f%e5%88%99" class="header-anchor"></a>一个更普遍的原则
+</h2><p>这件事不只适用于视频工具。</p>
+<p>任何&quot;一份数据、多种输出&quot;的系统都会遇到同一个问题：<strong>多个出口各自生成，迟早不一致。</strong></p>
+<p>正确的做法是让所有出口都指向同一个源头。中间可以有转换、有翻译、有排版，但不能有第二次&quot;理解&quot;。</p>
+<p><em>2026-11-02。下一步想试试让模板支持自定义句式，现在这套太硬了。</em></p>
+
+]]></content:encoded></item><item><title>不知道，是一种状态</title><link>https://adamsly05.github.io/blog/p/unknown-state/</link><pubDate>Mon, 02 Nov 2026 14:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/unknown-state/</guid><category>技术</category><description>有两件事看起来毫无关系：一个是手机相册的索引同步，一个是让模型拆解视频创意。
+它们栽在同一个错误上——把"不知道"当成了"没有"。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/unknown-state/cover.svg" alt="不知道，是一种状态"></p><p>有两件事看起来毫无关系：一个是手机相册的索引同步，一个是让模型拆解视频创意。</p>
+<p>它们栽在同一个错误上——<strong>把&quot;不知道&quot;当成了&quot;没有&quot;。</strong></p>
+<hr>
+<h2 id="一相册三种事实我写成了两种状态"><a href="#%e4%b8%80%e7%9b%b8%e5%86%8c%e4%b8%89%e7%a7%8d%e4%ba%8b%e5%ae%9e%e6%88%91%e5%86%99%e6%88%90%e4%ba%86%e4%b8%a4%e7%a7%8d%e7%8a%b6%e6%80%81" class="header-anchor"></a>一、相册：三种事实，我写成了两种状态
+</h2><p>加相册功能时，我写了个很自然的逻辑：</p>
+
+    <blockquote>
+        <p>索引里有、相册里没有 → 说明用户删了 → 从索引里删掉。</p>
+
+    </blockquote>
+<p>跑起来才发现问题。手机刚开机、系统还在做媒体扫描、用户只给了一半权限——这些时候扫描会读到「零张照片」。按上面的逻辑，整个索引会被判成&quot;已删除&quot;，一次性清空。</p>
+<p>用户看到的是回忆全没了。</p>
+<p>真实情况有三种：</p>
+<table>
+	<thead>
+			<tr>
+					<th>事实</th>
+					<th>我当时的表达</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>照片在</td>
+					<td>在列表里</td>
+			</tr>
+			<tr>
+					<td>照片确实不在了</td>
+					<td>不在列表里</td>
+			</tr>
+			<tr>
+					<td><strong>读不到</strong>（失败、没权限、正在扫描）</td>
+					<td>也不在列表里 ❌</td>
+			</tr>
+	</tbody>
+</table>
+<p>第三种被塞进了第二种。代码上就差一个返回值：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="c1">// 错的：失败也返回空列表
+</span></span></span><span class="line"><span class="cl"><span class="k">fun</span> <span class="nf">query</span><span class="p">():</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Media</span><span class="p">&gt;</span> <span class="p">=</span>
+</span></span><span class="line"><span class="cl">    <span class="n">runCatching</span> <span class="p">{</span> <span class="n">medias</span> <span class="p">}.</span><span class="n">getOrDefault</span><span class="p">(</span><span class="n">emptyList</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 对的：失败返回 null，只有真的没有才是空列表
+</span></span></span><span class="line"><span class="cl"><span class="k">fun</span> <span class="nf">query</span><span class="p">():</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Media</span><span class="p">&gt;?</span> <span class="p">=</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="p">{</span> <span class="n">medias</span> <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">Exception</span><span class="p">)</span> <span class="p">{</span> <span class="k">null</span> <span class="p">}</span>
+</span></span></code></pre></div><p>改完之后，同步逻辑变成：读取成功就按差异增删，<strong>读取返回 null 就什么都不做</strong>，保留旧索引。</p>
+<p>同一个坑还有两个变种：授权不能用一个布尔值表示（要分成「完整 / 部分 / 无」），以及&quot;暂时看不见&quot;的照片要能恢复，不能删。</p>
+<hr>
+<h2 id="二模型给它一个说不知道的地方"><a href="#%e4%ba%8c%e6%a8%a1%e5%9e%8b%e7%bb%99%e5%ae%83%e4%b8%80%e4%b8%aa%e8%af%b4%e4%b8%8d%e7%9f%a5%e9%81%93%e7%9a%84%e5%9c%b0%e6%96%b9" class="header-anchor"></a>二、模型：给它一个说「不知道」的地方
+</h2><p>做 UVS 时定了条规矩：它可以问我，但不能替我决定。</p>
+<p>第一版很朴素——&ldquo;请把用户创意整理成 JSON，缺的信息不要编&rdquo;。结果它编得挺好：用户只写了&quot;拍个视频&quot;，它能生成一份处处合理的 JSON，主体是&quot;人物&quot;、场景是&quot;城市街道&quot;、光线是&quot;自然光&quot;。每一条都说得通，每一条都不是用户说的。</p>
+<p>问题不在于它编得差，在于<strong>它编得太好，好到看不出是编的</strong>。</p>
+<p>解法是给&quot;不知道&quot;一个字段，而不是反复叮嘱它别编：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span> <span class="nt">&#34;field&#34;</span><span class="p">:</span> <span class="s2">&#34;environment.timeOfDay&#34;</span><span class="p">,</span> <span class="nt">&#34;reason&#34;</span><span class="p">:</span> <span class="s2">&#34;用户没提光线&#34;</span><span class="p">,</span> <span class="nt">&#34;level&#34;</span><span class="p">:</span> <span class="s2">&#34;B&#34;</span> <span class="p">}</span>
+</span></span></code></pre></div><p>分级是配套的：A 级必须问用户（主体、核心事件、结尾），B 级先给建议但要标出来，C 级可以自动补全、同样要标。</p>
+<p>改完才发现，模型不是不愿意诚实，是<strong>没有地方可以诚实</strong>——不给字段，它只能在&quot;编一个&quot;和&quot;什么都不写&quot;之间选。</p>
+<hr>
+<h2 id="三留了字段还不够"><a href="#%e4%b8%89%e7%95%99%e4%ba%86%e5%ad%97%e6%ae%b5%e8%bf%98%e4%b8%8d%e5%a4%9f" class="header-anchor"></a>三、留了字段还不够
+</h2><p>有了 <code>unknowns</code> 之后，新问题来了：它会一边问你三个问题，一边把完整的 JSON、提示词、分镜全放出来。等于没确认就定稿。</p>
+<p>根因在我这儿：判断能不能定稿时，我只检查了结构对不对，<strong>没检查有没有未确认的 A 级项</strong>。</p>
+<p>改成：只要 <code>unknowns</code> 里有任何 A 级条目，结果就不算通过，输出区不出现。</p>
+<p>另外两个意料之外的坑：</p>
+<ul>
+<li><strong>模型对&quot;什么算 A 级&quot;有自己的一套。</strong> 它会顺手把「环境地点」也标成 A 级，结果问了一堆我没打算问的。修法是把 A 级写成枚举——具体哪几项，而不是&quot;重要的那几项&quot;。</li>
+<li><strong>语言会漂。</strong> 前几轮中文，某一次突然冒出英文提问。加两条硬规则才稳住：提问必须简体中文，自由文本（除枚举外）必须简体中文。</li>
+</ul>
+<p>输出不合规时，把具体错误回给它，让它只改错、不重写：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">你上一次输出的 JSON 有 2 处不符合规范：
+</span></span><span class="line"><span class="cl">1. environment.timeOfDay：期望 night，收到「夜晚」
+</span></span><span class="line"><span class="cl">2. environment.details：期望数组，收到字符串
+</span></span></code></pre></div><p>这比单纯重试有用。重试是碰运气，带错误回去是让它知道错在哪。</p>
+<hr>
+<h2 id="它们其实是同一件事"><a href="#%e5%ae%83%e4%bb%ac%e5%85%b6%e5%ae%9e%e6%98%af%e5%90%8c%e4%b8%80%e4%bb%b6%e4%ba%8b" class="header-anchor"></a>它们其实是同一件事
+</h2><p>相册那边，<code>null</code> 和空列表是两个值；模型这边，<code>unknowns</code> 和&quot;编一个&quot;是两条路。</p>
+<p>共同点是：<strong>你的数据来自外部，就必须给&quot;没拿到&quot;留一个位置。</strong> 没有这个位置，它只能被挤进&quot;没有&quot;，而一旦被当成&quot;没有&quot;，程序就会去做一些不可逆的事——删索引、定稿、发出去。</p>
+<p>区别只在于：想清楚这件事之前，两边的代码看起来都是能跑的。</p>
+<p><em>2026-11-02，两个坑，同一个原因。</em></p>
+
+]]></content:encoded></item><item><title>在一部 Android 手机上跑 Hugo 和 Git</title><link>https://adamsly05.github.io/blog/p/hugo-on-android/</link><pubDate>Sun, 01 Nov 2026 15:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/hugo-on-android/</guid><category>手机</category><description>这个博客没有用任何"博客平台"。它是一堆静态文件，在一部手机上生成，推到一个 GitHub 仓库，由 GitHub Pages 提供服务。
+整个过程比想象的简单，坑也比想象的多。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/hugo-on-android/cover.svg" alt="在一部 Android 手机上跑 Hugo 和 Git"></p><p>这个博客没有用任何&quot;博客平台&quot;。它是一堆静态文件，在一部手机上生成，推到一个 GitHub 仓库，由 GitHub Pages 提供服务。</p>
+<p>整个过程比想象的简单，坑也比想象的多。</p>
+<hr>
+<h2 id="装-hugo"><a href="#%e8%a3%85-hugo" class="header-anchor"></a>装 Hugo
+</h2><p>Hugo 是单个二进制文件，arm64 版本直接下载解压就能用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">curl -LO https://github.com/gohugoio/hugo/releases/download/v0.169.0/hugo_extended_0.169.0_linux-arm64.tar.gz
+</span></span><span class="line"><span class="cl">tar xzf hugo_extended_0.169.0_linux-arm64.tar.gz hugo
+</span></span><span class="line"><span class="cl">chmod +x hugo
+</span></span><span class="line"><span class="cl">./hugo version
+</span></span></code></pre></div><p>注意要 <strong>extended</strong> 版本——很多主题用 SCSS，普通版编译会报错。</p>
+<p>构建速度：这个站 20 个页面，<strong>不到 1 秒</strong>。</p>
+<hr>
+<h2 id="授权-github"><a href="#%e6%8e%88%e6%9d%83-github" class="header-anchor"></a>授权 GitHub
+</h2><p>不想把 token 交出去，所以用 <code>gh</code> 的设备码登录：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">gh auth login --web
+</span></span></code></pre></div><p>它给一个 8 位验证码和网址，在手机浏览器里输入、确认，凭据就存在本机了。之后再配一次 <code>gh auth setup-git</code>，<code>git push</code> 就能直接走。</p>
+<hr>
+<h2 id="发布"><a href="#%e5%8f%91%e5%b8%83" class="header-anchor"></a>发布
+</h2><p>Hugo 生成的静态文件推到 <code>gh-pages</code> 分支，在仓库设置里把 Pages 指向它，就上线了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">hugo --minify
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> public <span class="o">&amp;&amp;</span> git push -f origin gh-pages
+</span></span></code></pre></div><p>也可以写 GitHub Actions 自动做，但那需要给授权额外的 <code>workflow</code> 权限。我图省事，直接推构建结果。</p>
+<hr>
+<h2 id="三个把我坑住的细节"><a href="#%e4%b8%89%e4%b8%aa%e6%8a%8a%e6%88%91%e5%9d%91%e4%bd%8f%e7%9a%84%e7%bb%86%e8%8a%82" class="header-anchor"></a>三个把我坑住的细节
+</h2><p><strong>一、<code>baseURL</code> 和子路径。</strong></p>
+<p>站点地址是 <code>https://用户名.github.io/blog/</code>，不是在根目录。如果 <code>baseURL</code> 配错，生成的 CSS 路径会指向 <code>/scss/...</code>，页面加载出来的样子<strong>完全没有样式</strong>——你会以为是主题不适配手机，其实是样式表 404。</p>
+<p>本地预览更要注意：用 <code>hugo -b http://127.0.0.1:8000/</code> 临时覆盖，别用生产地址。</p>
+<p><strong>二、图片路径同理。</strong></p>
+<p>写 <code>image: &quot;/img/cover.jpg&quot;</code>，上线后就是 404。正确做法是把图片放进文章的目录（page bundle），用相对路径 <code>cover.jpg</code>，Hugo 会自动给出带子路径的正确地址。</p>
+<p><strong>三、浏览器缓存会骗你。</strong></p>
+<p>改了 CSS，手机上一看没变化，很可能是缓存。用 <code>?v=2</code> 这样的查询参数强制刷新再判断。</p>
+<hr>
+<h2 id="结论"><a href="#%e7%bb%93%e8%ae%ba" class="header-anchor"></a>结论
+</h2><p><strong>手机不缺能力，缺的是顺手。</strong></p>
+<p>构建、发布、授权这些&quot;一次性&quot;的事，手机都能干，而且不慢。真正折磨人的是每天都要做的部分：改样式、看效果、反复微调——那需要一块大屏。</p>
+<p>但如果你只是想&quot;有个地方写东西&quot;，一部手机确实够了。</p>
+
+]]></content:encoded></item><item><title>我没有电脑，这半年是这么写代码的</title><link>https://adamsly05.github.io/blog/p/phone-as-computer/</link><pubDate>Sun, 01 Nov 2026 09:00:00 +0800</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/phone-as-computer/</guid><category>手机</category><description>我没有一台属于自己的、固定的电脑。
+不是完全不碰电脑，而是没有那种"打开就能干活"的设备。这半年大部分代码、文档和这个博客，都是在一部 Android 手机上完成的。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/phone-as-computer/cover.svg" alt="我没有电脑，这半年是这么写代码的"></p><p>我没有一台属于自己的、固定的电脑。</p>
+<p>不是完全不碰电脑，而是没有那种&quot;打开就能干活&quot;的设备。这半年大部分代码、文档和这个博客，都是在一部 Android 手机上完成的。</p>
+<hr>
+<h2 id="环境长什么样"><a href="#%e7%8e%af%e5%a2%83%e9%95%bf%e4%bb%80%e4%b9%88%e6%a0%b7" class="header-anchor"></a>环境长什么样
+</h2><p>手机里跑着一个 Linux 用户态环境（proot，不需要 root）。里面有：</p>
+<ul>
+<li><code>node</code>、<code>python3</code>、<code>git</code>、<code>hugo</code>、<code>ffmpeg</code></li>
+<li>一个 AI 编程助手，负责读代码、改文件、跑命令</li>
+<li>文件系统直连着手机存储的 <code>Download</code> 和 <code>DCIM</code></li>
+</ul>
+<p>它不是一个&quot;模拟器&quot;，是真的在跑 Linux 程序。上面那个 2.4 GB 的工程包，我就是在里面读的；这个博客，也是在里面构建然后推上 GitHub 的。</p>
+<hr>
+<h2 id="一天大概是怎么过的"><a href="#%e4%b8%80%e5%a4%a9%e5%a4%a7%e6%a6%82%e6%98%af%e6%80%8e%e4%b9%88%e8%bf%87%e7%9a%84" class="header-anchor"></a>一天大概是怎么过的
+</h2><p><strong>写代码</strong>：跟 AI 说&quot;把这个函数改成异步&quot;，它读文件、改、跑测试。我要做的是描述清楚和验收结果。</p>
+<p><strong>查资料</strong>：手机上开着浏览器，看到一半切回来让 AI 解释一段代码。</p>
+<p><strong>写文档</strong>：Markdown 写在手机上，需要 Word 就用脚本生成 <code>.docx</code>，WPS 打开微调。</p>
+<p><strong>发布</strong>：构建 + 推送，一分钟。</p>
+<p>整个过程里，<strong>手机是屏幕和键盘，运算在后台的 Linux 里</strong>。</p>
+<hr>
+<h2 id="哪些事顺手哪些不顺手"><a href="#%e5%93%aa%e4%ba%9b%e4%ba%8b%e9%a1%ba%e6%89%8b%e5%93%aa%e4%ba%9b%e4%b8%8d%e9%a1%ba%e6%89%8b" class="header-anchor"></a>哪些事顺手，哪些不顺手
+</h2><p><strong>顺手</strong>：</p>
+<ul>
+<li>一切命令行能做的事</li>
+<li>文本编辑、搜索、批量替换</li>
+<li>跑脚本、处理图片视频</li>
+<li>发布静态网站</li>
+</ul>
+<p><strong>不顺手</strong>：</p>
+<ul>
+<li>需要看大图的活（界面设计、排版微调）</li>
+<li>长时间盯代码（六寸屏真的累）</li>
+<li>需要同时开五个窗口的调试</li>
+<li>真机调试安卓 App（这个是真没办法）</li>
+</ul>
+<hr>
+<h2 id="两个真实体会"><a href="#%e4%b8%a4%e4%b8%aa%e7%9c%9f%e5%ae%9e%e4%bd%93%e4%bc%9a" class="header-anchor"></a>两个真实体会
+</h2><p><strong>一、真正的瓶颈不是算力，是输入和屏幕。</strong></p>
+<p>手机有 12 GB 内存、8 核，比很多人的笔记本强。但 6 寸屏 + 软键盘会把你所有耐心磨光。花了 200 块买蓝牙键鼠之后，效率提升比换任何软件都大。</p>
+<p><strong>二、AI 改变的是&quot;谁能干活&quot;，不是&quot;干活爽不爽&quot;。</strong></p>
+<p>以前没有电脑基本等于不能开发。现在可以把&quot;写代码&quot;这步交出去，自己负责想清楚要什么、验收结果。这件事对没有固定设备的人来说，是质变。</p>
+<hr>
+<h2 id="什么时候该上云"><a href="#%e4%bb%80%e4%b9%88%e6%97%b6%e5%80%99%e8%af%a5%e4%b8%8a%e4%ba%91" class="header-anchor"></a>什么时候该上云
+</h2><p>我在认真考虑租一台最便宜的云服务器，理由只有一个：<strong>手机一锁屏、一清后台，任务就断了。</strong> 云主机 24 小时在线，可以跑长任务。</p>
+<p>但那是&quot;更方便&quot;，不是&quot;能不能&quot;。现在这套，已经够我把东西做出来。</p>
+
+]]></content:encoded></item><item><title>我给自己的日记 App 写了 441 个测试</title><link>https://adamsly05.github.io/blog/p/441-tests/</link><pubDate>Sun, 01 Nov 2026 00:00:00 +0000</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/441-tests/</guid><category>技术</category><description>这个 App 不上架，只有我一个用户。
+它叫「理砚」，做一件很朴素的事：每天把自己记下来——心情、睡了几个小时、走了多少步、花了多少钱。听起来没什么稀奇，应用商店里能搜出几百个。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/441-tests/cover.svg" alt="我给自己的日记 App 写了 441 个测试"></p><p>这个 App 不上架，只有我一个用户。</p>
+<p>它叫「理砚」，做一件很朴素的事：每天把自己记下来——心情、睡了几个小时、走了多少步、花了多少钱。听起来没什么稀奇，应用商店里能搜出几百个。</p>
+<p>但每一个都让我不舒服。</p>
+<p>有的打开就要注册，仿佛我的日记需要经过别人的服务器；有的免费版塞满广告，导出功能要开会员；还有的我用了两年，某天服务停了，数据跟着一起消失。</p>
+<p>所以我写了一个只给自己用的。</p>
+<hr>
+<h2 id="三个决定"><a href="#%e4%b8%89%e4%b8%aa%e5%86%b3%e5%ae%9a" class="header-anchor"></a>三个决定
+</h2><p><strong>第一，能自动读的，绝不让人手抄。</strong></p>
+<p>步数、睡眠、使用时长、通知条数，这些手机本来就知道，凭什么要我再输一遍？所以理砚会自己去读系统数据，账单靠导出的 CSV 补。</p>
+<p>这一点很影响体验：一个需要你每天手动填十项的表单，你坚持不过两周。能自动填七项，只剩三项要打勾，才活得下去。</p>
+<p><strong>第二，数据不出手机。</strong></p>
+<p>没有账号，没有云端，没有同步。备份是一个你能自己拿走的 zip，恢复靠你自己保存的那个文件。</p>
+<p>代价很明显：手机丢了就没了。我认。因为另一种代价是——你的日记在别人的服务器上，而你并不知道它会被拿去做什么。</p>
+<p><strong>第三，相册只做索引，不碰原图。</strong></p>
+<p>后来加的功能叫「时光回忆」：把相册里的照片按时间线、按「那年今日」、按年份重新摆一遍。</p>
+<p>它只读，不复制、不移动、不上传、不删除任何一张原图。索引坏了，重扫一遍就好；相册里你删了照片，下次同步索引就该消失——我不是回收站。</p>
+<hr>
+<h2 id="一个让我改了两遍的地方"><a href="#%e4%b8%80%e4%b8%aa%e8%ae%a9%e6%88%91%e6%94%b9%e4%ba%86%e4%b8%a4%e9%81%8d%e7%9a%84%e5%9c%b0%e6%96%b9" class="header-anchor"></a>一个让我改了两遍的地方
+</h2><p>写相册索引的时候，我遇到一个看起来很简单、实际上很麻烦的问题：<strong>怎么判断一张照片&quot;已经不在手机上了&quot;？</strong></p>
+<p>第一版是这么想的：扫一遍相册，库里有的、相册没有的，就标成删除。</p>
+<p>跑起来才发现这是灾难。手机刚开机、系统还在做媒体扫描、或者用户只给了一半权限的时候，扫描会读到「零张照片」。按上面的逻辑，整个相册的索引会被判成&quot;全部已删除&quot;，用户看到的是「回忆全没了」。</p>
+<p>后来把它拆成三种状态，而不是两种：</p>
+<ul>
+<li><strong>在</strong>：读到了，正常显示</li>
+<li><strong>不在</strong>：读到了、确认没有，才删索引</li>
+<li><strong>不知道</strong>：读取失败、权限不足、正在扫描——<strong>什么都不做</strong></li>
+</ul>
+<p>也就是说，读取失败必须能和&quot;确实是空的&quot;区分开。代码上就是从「失败返回空列表」改成「失败返回 null」，但想明白这件事花了我一晚上。</p>
+<p>这条规则后来被我写进了注释里：<strong>查不到 ≠ 已删除。</strong></p>
+<hr>
+<h2 id="为什么是-441-个测试"><a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e6%98%af-441-%e4%b8%aa%e6%b5%8b%e8%af%95" class="header-anchor"></a>为什么是 441 个测试
+</h2><p>有人会问，自用软件写什么测试。</p>
+<p>因为我没有第二个人帮我试。</p>
+<p>商业软件有 QA、有灰度、有海量用户帮你踩坑。我只有一台主力机，而且里面是我两三年的记录。<strong>一次迁移写错，就是清零。</strong></p>
+<p>所以那些最容易毁数据的地方，必须有测试：什么时候允许删索引、授权算不算&quot;全&quot;、数据库从 v4 升到 v5 会不会丢东西。</p>
+<p>数据库迁移这块我做得比较狠：Room 的建表语句只要和它期望的差一个字符，校验就会失败，然后直接丢库重建。所以我写了个脚本，把迁移里手写的 <code>CREATE</code> 和构建时自动生成的建表语句去空白后逐字比对——六条语句全等，才敢发版。</p>
+<p>这套做法一点也不优雅，但它能在我睡着的时候替我盯着。</p>
+<hr>
+<h2 id="最后"><a href="#%e6%9c%80%e5%90%8e" class="header-anchor"></a>最后
+</h2><p>写给自己用的东西，标准其实不一样。</p>
+<p>不用考虑留存率、不用讨好新用户、不用为上架妥协审美。唯一的标准是：<strong>半年后的我打开它，会不会觉得当初的自己做得对。</strong></p>
+<p>441 个测试不是为了给别人看，是为了让我敢在半夜点下「安装」。</p>
+<hr>
+<p><em>这篇是个开头。后面大概会写：中文路径下的 Gradle 单测为什么会全挂、一个只读相册索引怎么做增量、以及为什么我明知危险还留着那个会丢数据的开关。</em></p>
+
+]]></content:encoded></item><item><title>开张</title><link>https://adamsly05.github.io/blog/p/kai-zhang/</link><pubDate>Sun, 01 Nov 2026 00:00:00 +0000</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/kai-zhang/</guid><category>随笔</category><description>想了很久要不要写博客。
+阻碍从来不是技术——真要搭，一台手机一个下午就够了。真正的阻碍是那个问题：写什么？
+我一开始的答案是"等技术厉害了再写"。后来发现这句话的意思其实是"永远不写"。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/kai-zhang/cover.svg" alt="开张"></p><p>想了很久要不要写博客。</p>
+<p>阻碍从来不是技术——真要搭，一台手机一个下午就够了。真正的阻碍是那个问题：<strong>写什么？</strong></p>
+<p>我一开始的答案是&quot;等技术厉害了再写&quot;。后来发现这句话的意思其实是&quot;永远不写&quot;。</p>
+<p>所以换个说法：这不是作品集，是笔记本。写踩过的坑、做过的决定、想明白的事。哪怕只有一年后的自己会搜到，也值了。</p>
+<p>会写的东西大概三类：技术上的坑、生活里的片段、自己做的项目。不追热点，不保证更新频率，想到就写。</p>
+<p>第一篇正式文章已经发了：<a class="link" href="/p/441-tests/" >《我给自己的日记 App 写了 441 个测试》</a>。</p>
+<p>先这样。</p>
+
+]]></content:encoded></item><item><title>为什么我的 App 不做云同步</title><link>https://adamsly05.github.io/blog/p/no-cloud/</link><pubDate>Sat, 31 Oct 2026 00:00:00 +0000</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/no-cloud/</guid><category>技术</category><description>做日记 App 最省事的功能，恰恰是云同步——加个账号，接个后端，多设备自动合并，用户就不用操心备份了。
+我没做。这篇文章说说为什么，以及代价是什么。
+一句话：我不想让"我的日记在哪"变成一个需要信任别人的问题 数据不出手机，意味着：</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/no-cloud/cover.svg" alt="为什么我的 App 不做云同步"></p><p>做日记 App 最省事的功能，恰恰是云同步——加个账号，接个后端，多设备自动合并，用户就不用操心备份了。</p>
+<p>我没做。这篇文章说说为什么，以及代价是什么。</p>
+<hr>
+<h2 id="一句话我不想让我的日记在哪变成一个需要信任别人的问题"><a href="#%e4%b8%80%e5%8f%a5%e8%af%9d%e6%88%91%e4%b8%8d%e6%83%b3%e8%ae%a9%e6%88%91%e7%9a%84%e6%97%a5%e8%ae%b0%e5%9c%a8%e5%93%aa%e5%8f%98%e6%88%90%e4%b8%80%e4%b8%aa%e9%9c%80%e8%a6%81%e4%bf%a1%e4%bb%bb%e5%88%ab%e4%ba%ba%e7%9a%84%e9%97%ae%e9%a2%98" class="header-anchor"></a>一句话：我不想让&quot;我的日记在哪&quot;变成一个需要信任别人的问题
+</h2><p>数据不出手机，意味着：</p>
+<ul>
+<li>没有账号，打开就能用</li>
+<li>没有服务器，不存在&quot;某天停服&quot;</li>
+<li>没有隐私政策要读，因为没东西可传</li>
+</ul>
+<p>代价也很明确：<strong>手机丢了，数据就没了。</strong></p>
+<p>我认这个代价。因为另一个代价是：你的日记在别人的服务器上，而你并不清楚它会被怎么处理——哪怕对方承诺得很好。</p>
+<hr>
+<h2 id="那个人人都会问的问题"><a href="#%e9%82%a3%e4%b8%aa%e4%ba%ba%e4%ba%ba%e9%83%bd%e4%bc%9a%e9%97%ae%e7%9a%84%e9%97%ae%e9%a2%98" class="header-anchor"></a>那个&quot;人人都会问&quot;的问题
+</h2><p>「不做云同步，换手机怎么办？」</p>
+<p>答案是你自己拿一个文件走：导出 zip，传到新手机，导入。</p>
+<p>这听起来很麻烦，但一年用不了几次。相比之下，为一个几乎不用的功能，去承担一整套账号体系、异地容灾、隐私合规的成本，不划算。</p>
+<p>更实际的一点：<strong>单人维护的同步服务，可靠性远不如本地文件。</strong> 我见过太多&quot;云端备份其实早就没在备份&quot;的故事。</p>
+<hr>
+<h2 id="那备份怎么做"><a href="#%e9%82%a3%e5%a4%87%e4%bb%bd%e6%80%8e%e4%b9%88%e5%81%9a" class="header-anchor"></a>那备份怎么做
+</h2><p>三层，都不依赖我：</p>
+<ol>
+<li><strong>手动导出</strong>：一个 zip，包含数据库和图片索引，用户自己存</li>
+<li><strong>自动备份</strong>：按周期写到手机的某个目录，用户能看见、能拷走</li>
+<li><strong>可恢复性</strong>：导入流程要能处理&quot;结构变了&quot;的情况，宁可提示得啰嗦一点</li>
+</ol>
+<p>关键是第三点。备份这东西，<strong>没验证过恢复，就不算有备份</strong>。</p>
+<hr>
+<h2 id="什么产品该做云同步"><a href="#%e4%bb%80%e4%b9%88%e4%ba%a7%e5%93%81%e8%af%a5%e5%81%9a%e4%ba%91%e5%90%8c%e6%ad%a5" class="header-anchor"></a>什么产品该做云同步
+</h2><p>我不认为&quot;本地优先&quot;是普适真理。这些情况该做：</p>
+<ul>
+<li>多设备是核心场景（笔记、待办）</li>
+<li>数据本身要协作（共享日历）</li>
+<li>用户完全不懂文件（大众消费品）</li>
+</ul>
+<p>日记属于&quot;一个人、一台设备、长期记录&quot;，本地优先反而更合适。</p>
+<hr>
+<h2 id="结论"><a href="#%e7%bb%93%e8%ae%ba" class="header-anchor"></a>结论
+</h2><p><strong>&ldquo;要不要上云&quot;不是一个技术问题，是一个信任边界问题。</strong></p>
+<p>清楚自己把边界画在哪，并且把代价讲给用户听，比跟着功能表走更诚实。</p>
+
+]]></content:encoded></item><item><title>中文路径下，Gradle 单测为什么会全挂</title><link>https://adamsly05.github.io/blog/p/gradle-path/</link><pubDate>Thu, 29 Oct 2026 00:00:00 +0000</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/gradle-path/</guid><category>技术</category><description>我的工程放在一个中文路径下。
+assembleRelease 跑得好好的，能出包、能装机。但一跑单元测试，403 个用例全部失败，清一色的 ClassNotFoundException。
+那一刻我以为自己把代码写坏了。
+排查顺序（都试过，都没用） clean + 删 .gradle 缓存 —— 没用 怀疑依赖冲突，重建依赖树 —— 没问题 加 jvmArgs '-Dfile.encoding=UTF-8' —— 没用，一点变化都没有 升级 AGP / Kotlin —— 没用 直到我注意到一个细节：release 编译正常，只有测试挂。 而且不是某个用例挂，是"连类都找不到"——说明压根不是代码问题，是测试进程启动时 classpath 就错了。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/gradle-path/cover.svg" alt="中文路径下，Gradle 单测为什么会全挂"></p><p>我的工程放在一个中文路径下。</p>
+<p><code>assembleRelease</code> 跑得好好的，能出包、能装机。但一跑单元测试，<strong>403 个用例全部失败</strong>，清一色的 <code>ClassNotFoundException</code>。</p>
+<p>那一刻我以为自己把代码写坏了。</p>
+<hr>
+<h2 id="排查顺序都试过都没用"><a href="#%e6%8e%92%e6%9f%a5%e9%a1%ba%e5%ba%8f%e9%83%bd%e8%af%95%e8%bf%87%e9%83%bd%e6%b2%a1%e7%94%a8" class="header-anchor"></a>排查顺序（都试过，都没用）
+</h2><ol>
+<li><code>clean</code> + 删 <code>.gradle</code> 缓存 —— 没用</li>
+<li>怀疑依赖冲突，重建依赖树 —— 没问题</li>
+<li>加 <code>jvmArgs '-Dfile.encoding=UTF-8'</code> —— 没用，一点变化都没有</li>
+<li>升级 AGP / Kotlin —— 没用</li>
+</ol>
+<p>直到我注意到一个细节：<strong>release 编译正常，只有测试挂。</strong> 而且不是某个用例挂，是&quot;连类都找不到&quot;——说明压根不是代码问题，是测试进程启动时 classpath 就错了。</p>
+<p>原因出在这里：Gradle 跑单测时会 <strong>fork 一个新的 JVM 进程</strong>，把一长串 classpath 当命令行参数传过去。路径里带中文时，这个参数在某些环节被按错误编码拆解，于是所有类都定位不到。</p>
+<p>编译不 fork 进程，所以没事；测试 fork，所以全挂。</p>
+<hr>
+<h2 id="解法别跟它较劲绕过去"><a href="#%e8%a7%a3%e6%b3%95%e5%88%ab%e8%b7%9f%e5%ae%83%e8%be%83%e5%8a%b2%e7%bb%95%e8%bf%87%e5%8e%bb" class="header-anchor"></a>解法：别跟它较劲，绕过去
+</h2><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bat" data-lang="bat"><span class="line"><span class="cl">subst R: <span class="s2">&#34;c:\Users\someone\Desktop\理砚开发文件&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">cd</span> /d R:\理砚手机端
+</span></span><span class="line"><span class="cl">gradlew.bat testDebugUnitTest
+</span></span><span class="line"><span class="cl">subst R: /d
+</span></span></code></pre></div><p>把一个 ASCII 盘符映射到中文目录，在 <code>R:\</code> 下跑，跑完删掉映射。全套写进一个 <code>.bat</code>，双击就行。</p>
+<p>不优雅，但它彻底绕开了编码问题——不依赖任何 <code>-D</code> 参数，也不依赖 Gradle 版本。</p>
+<hr>
+<h2 id="两个会让你误判的细节"><a href="#%e4%b8%a4%e4%b8%aa%e4%bc%9a%e8%ae%a9%e4%bd%a0%e8%af%af%e5%88%a4%e7%9a%84%e7%bb%86%e8%8a%82" class="header-anchor"></a>两个会让你误判的细节
+</h2><p><strong>一、<code>FROM-CACHE</code> 不等于跑过。</strong></p>
+<p>Gradle 控制台出现 <code>testDebugUnitTest FROM-CACHE</code>，意思是这次直接复用了缓存结果，<strong>根本没有执行测试</strong>。如果你把一个坏掉的缓存当成&quot;通过&quot;，后面会很难查。</p>
+<p><strong>二、看报告，不要只看控制台。</strong></p>
+<p>控制台只给你摘要，具体哪个类没找到、哪个断言失败，要读 <code>app/build/test-results/</code> 里的 XML 报告。我当时就是盯着控制台猜了半天。</p>
+<hr>
+<h2 id="结论"><a href="#%e7%bb%93%e8%ae%ba" class="header-anchor"></a>结论
+</h2><p><strong>中文路径 + fork 的测试 worker，是工具链层面的系统性坑，不值得逐个参数去调。</strong> 用盘符映射绕过去，把这套写进脚本，然后忘掉它。</p>
+<p>如果你的项目路径里也有中文、空格或者特殊字符，而某个环节&quot;莫名其妙地全红&quot;，先怀疑路径，再怀疑代码。</p>
+
+]]></content:encoded></item><item><title>晨记</title><link>https://adamsly05.github.io/blog/p/morning/</link><pubDate>Wed, 28 Oct 2026 00:00:00 +0000</pubDate><guid isPermaLink="true">https://adamsly05.github.io/blog/p/morning/</guid><category>随笔</category><description>
+早起这件事，我试了三次。
+第一次靠意志力，定了五点半的闹钟。第三天开始按掉继续睡，第七天把闹钟删了。
+第二次靠方法：早睡、把手机放远、睡前不看屏幕。坚持了半个月，然后一个通宵改完，全部归零。</description><content:encoded><![CDATA[<p><img src="https://adamsly05.github.io/blog/p/morning/cover.svg" alt="晨记"></p><p><img alt="雾里的山路" class="gallery-image" data-flex-basis="360px" data-flex-grow="150" height="400" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/blog/p/morning/road.jpg" width="600"></p>
+<p>早起这件事，我试了三次。</p>
+<p>第一次靠意志力，定了五点半的闹钟。第三天开始按掉继续睡，第七天把闹钟删了。</p>
+<p>第二次靠方法：早睡、把手机放远、睡前不看屏幕。坚持了半个月，然后一个通宵改完，全部归零。</p>
+<p>第三次我换了个思路——不问「几点起」，先问「起来干什么」。答案是：有件想做的事。那段时间在写一个小工具，睡前会想着明天要加哪个功能，结果六点多自己就醒了。</p>
+<p>所以问题可能不在作息表，在于醒来之后没有值得起来的东西。</p>
+<p>现在我不定闹钟了，只保证睡前有一件<strong>明天想接着做</strong>的事。睡得晚就晚起，但很少赖床。</p>
+<p>这大概不算什么方法论，只是一个失败三次之后留下来的观察。</p>
+
+]]></content:encoded></item></channel></rss>
