@@ -11,6 +11,8 @@ tags:
   - 设计
   - AI
   - 工程
+series:
+  - uvs-design
 ---
 
 UVS Studio 要产出四样东西：结构化 JSON、中文提示词、分镜时间轴、平台适配说明。

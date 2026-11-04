@@ -10,6 +10,8 @@ categories:
 tags:
   - 安全
   - 服务器
+series:
+  - ops
 ---
 
 早上打开手机，看到一条告警：

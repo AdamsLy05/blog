@@ -7,7 +7,7 @@
     </header>
 
     <div class="series-cards">
-    {{- range .Pages }}
+    {{- range .Pages.ByWeight }}
         {{- $count := len .Pages -}}
         <a class="series-card" href="{{ .RelPermalink }}">
             <div class="series-card__top">

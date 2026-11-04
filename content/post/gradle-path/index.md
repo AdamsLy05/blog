@@ -11,6 +11,8 @@ tags:
   - Android
   - Gradle
   - 踩坑
+series:
+  - liyan
 ---
 
 我的工程放在一个中文路径下。

@@ -11,6 +11,8 @@ tags:
   - Android
   - 测试
   - 理砚
+series:
+  - liyan
 ---
 
 这个 App 不上架，只有我一个用户。
