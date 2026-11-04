@@ -81,7 +81,7 @@ cd public && git push -f origin gh-pages
 
 ---
 
-## 一句话结论
+## 结论
 
 **手机不缺能力，缺的是顺手。**
 
